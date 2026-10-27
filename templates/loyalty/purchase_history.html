@@ -1,0 +1,99 @@
+ {% extends "base.html" %}
+{% block title %}Purchase History | VSLink{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2">Purchase history</h1>
+        <p class="text-muted mb-0">Your purchases and loyalty activity.</p>
+    </div>
+    <div class="text-end">
+        <div class="text-muted small">Current points balance</div>
+        <div class="fs-4 fw-semibold">{{ balance }}</div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Purchases</h2>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Purchase</th>
+                        <th>Date</th>
+                        <th>Original price</th>
+                        <th>Discount</th>
+                        <th>Paid</th>
+                        <th>Points earned</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for purchase in purchases %}
+                        <tr>
+                            <td>{{ purchase.product_name }}</td>
+                            <td>{{ purchase.purchased_at|date:"d M Y, H:i" }}</td>
+                            <td>₹{{ purchase.base_price }}</td>
+                            <td>₹{{ purchase.discount_amount }}</td>
+                            <td>₹{{ purchase.price_paid }}</td>
+                            <td class="text-success">+{{ purchase.points_earned }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-muted">
+                                You haven't made any purchases yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">Points ledger</h2>
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Activity</th>
+                        <th>Purchase</th>
+                        <th>Points change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in transactions %}
+                        <tr>
+                            <td>{{ item.created_at|date:"d M Y, H:i" }}</td>
+                            <td>{{ item.get_type_display }}</td>
+                            <td>
+                                {% if item.purchase %}
+                                    #{{ item.purchase.pk }} — {{ item.purchase.product_name }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                            <td class="{% if item.points < 0 %}text-danger{% else %}text-success{% endif %}">
+                                {% if item.points > 0 %}+{% endif %}{{ item.points }}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-muted">
+                                No points activity yet.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<a class="btn btn-primary mt-3" href="{% url 'loyalty:catalogue' %}">
+    Browse products
+</a>
+{% endblock %}
