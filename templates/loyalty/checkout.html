@@ -1,0 +1,49 @@
+ {% extends "base.html" %}
+{% block title %}Checkout | VSLink{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h3 mb-3">Checkout</h1>
+
+                <h2 class="h5">{{ product.name }}</h2>
+                <p class="text-muted">{{ product.description }}</p>
+                <p>Price: <strong>₹{{ product.price }}</strong></p>
+                <p>Points earned: <strong>{{ product.points }}</strong></p>
+                <p>Available points: <strong>{{ balance }}</strong></p>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <label class="form-label" for="reward_id">
+                        Optional reward
+                    </label>
+                    <select class="form-select mb-3" name="reward_id" id="reward_id">
+                        <option value="">No reward</option>
+                        {% for reward in rewards %}
+                            <option value="{{ reward.pk }}">
+                                {{ reward.name }} — {{ reward.points_required }} points
+                            </option>
+                        {% endfor %}
+                    </select>
+
+                    <p class="small text-muted">
+                        This is a simulated checkout. No payment will be taken.
+                        Applying a reward deducts its required points.
+                    </p>
+
+                    <button type="submit" class="btn btn-primary">
+                        Confirm purchase
+                    </button>
+                    <a class="btn btn-outline-secondary"
+                       href="{% url 'loyalty:catalogue' %}">
+                        Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
