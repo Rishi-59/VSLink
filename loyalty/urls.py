@@ -23,4 +23,14 @@ urlpatterns = [
         views.product_toggle_view,
         name="product_toggle",
     ),
+    path(
+        "products/<int:pk>/checkout/",
+        views.checkout_view,
+        name="checkout",
+    ),
+    path(
+        "purchases/",
+        views.purchase_history_view,
+        name="purchase_history",
+    ),
 ]
