@@ -125,8 +125,15 @@ def calculate_discount(reward, price):
     if reward.discount_type == Reward.DiscountType.FIXED:
         discount = reward.discount_value
     else:
-        discount = price * reward.discount_value / Decimal("100")
-        discount = min(discount, reward.max_discount_amount)
+        discount = (
+            price * reward.discount_value / Decimal("100")
+        )
+
+        if reward.max_discount_amount is not None:
+            discount = min(
+                discount,
+                reward.max_discount_amount,
+            )
 
     return min(discount, price).quantize(
         Decimal("0.01"),
