@@ -1,35 +1,122 @@
 
 {% extends "base.html" %}
-{% block title %}Login | VSLink{% endblock %}
+
+{% block title %}Sign In | VSLink{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h1 class="h3 mb-3">Welcome back</h1>
-                <form method="post">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label" for="{{ field.id_for_label }}">
-                                {{ field.label }}
-                            </label>
-                            {{ field }}
-                            {% for error in field.errors %}
-                                <div class="text-danger small">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-                    {% endfor %}
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-                    {% endif %}
-                    <button class="btn btn-primary w-100" type="submit">Log in</button>
-                </form>
-                <p class="mt-3 mb-0">New to VSLink?
-                    <a href="{% url 'accounts:register' %}">Create an account</a>
-                </p>
+<section class="auth-shell">
+    <aside class="auth-showcase">
+        <div class="auth-decoration auth-decoration-one"></div>
+        <div class="auth-decoration auth-decoration-two"></div>
+        <div class="auth-decoration auth-decoration-three"></div>
+
+        <a class="auth-brand" href="{% url 'home' %}">
+            <span class="brand-mark">V</span>
+            <span>VSLink<span class="brand-period">.</span></span>
+        </a>
+
+        <div class="auth-showcase-content">
+            <span class="auth-eyebrow">
+                <i class="bi bi-stars me-2"></i>YOUR LOYALTY JOURNEY
+            </span>
+
+            <h1>Welcome back.</h1>
+            <p class="auth-showcase-description">
+                Your purchases, loyalty points, rewards and referral network
+                are all waiting for you.
+            </p>
+
+            <div class="auth-benefits">
+                <div>
+                    <span class="auth-benefit-icon">
+                        <i class="bi bi-stars"></i>
+                    </span>
+                    <span>
+                        <strong>Keep earning</strong>
+                        <small>Track your loyalty points</small>
+                    </span>
+                </div>
+
+                <div>
+                    <span class="auth-benefit-icon">
+                        <i class="bi bi-gift"></i>
+                    </span>
+                    <span>
+                        <strong>Enjoy your rewards</strong>
+                        <small>Discover eligible offers</small>
+                    </span>
+                </div>
+
+                <div>
+                    <span class="auth-benefit-icon">
+                        <i class="bi bi-diagram-3"></i>
+                    </span>
+                    <span>
+                        <strong>Grow your network</strong>
+                        <small>Explore your referrals</small>
+                    </span>
+                </div>
             </div>
         </div>
+
+        <div class="auth-showcase-footer">
+            <i class="bi bi-shield-check me-2"></i>
+            A connected loyalty experience
+        </div>
+    </aside>
+
+    <div class="auth-panel">
+        <div class="auth-panel-inner">
+            <div class="auth-mobile-brand">
+                <span class="brand-mark">V</span>
+                <span class="brand-name">VSLink<span class="brand-period">.</span></span>
+            </div>
+
+            <div class="auth-form-heading">
+                <span class="section-kicker">ACCOUNT ACCESS</span>
+                <h2>Sign in to VSLink</h2>
+                <p>Enter your credentials to continue to your account.</p>
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="auth-field">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        {{ field }}
+
+                        {% for error in field.errors %}
+                            <div class="auth-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <button type="submit"
+                        class="btn btn-primary btn-lg w-100 auth-submit">
+                    Sign in
+                    <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </form>
+
+            <div class="auth-switch">
+                New to VSLink?
+                <a href="{% url 'accounts:register' %}">Create an account</a>
+            </div>
+
+            <p class="auth-legal">
+                By continuing, you agree to use VSLink responsibly.
+            </p>
+        </div>
     </div>
-</div>
+</section>
 {% endblock %}
