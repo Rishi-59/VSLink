@@ -1,37 +1,342 @@
 
 {% extends "base.html" %}
-{% block title %}My Profile | VSLink{% endblock %}
+
+{% block title %}My Dashboard | VSLink{% endblock %}
+
 {% block content %}
-<div class="card shadow-sm">
-    <div class="card-body p-4">
-        <h1 class="h3">Hello, {{ user.first_name }}!</h1>
-        <p class="text-muted">Your VSLink account</p>
+<div class="dashboard-page">
 
-        <dl class="row">
-            <dt class="col-sm-3">Name</dt>
-            <dd class="col-sm-9">{{ user.get_full_name }}</dd>
+    <section class="dashboard-intro">
+        <div>
+            <div class="section-kicker">CUSTOMER OVERVIEW</div>
+            <h1 class="dashboard-title mt-2">
+                Welcome back, {{ user.first_name|default:user.username }}
+            </h1>
+            <p class="dashboard-subtitle mb-0">
+                Here's your loyalty activity and referral network at a glance.
+            </p>
+        </div>
 
-            <dt class="col-sm-3">Email</dt>
-            <dd class="col-sm-9">{{ user.email }}</dd>
+        <a href="{% url 'loyalty:catalogue' %}"
+           class="btn btn-primary px-4">
+            <i class="bi bi-bag me-2"></i>Browse products
+        </a>
+    </section>
 
-            <dt class="col-sm-3">Phone</dt>
-            <dd class="col-sm-9">{{ profile.phone|default:"Not provided" }}</dd>
+    <section class="row g-4 dashboard-summary">
+        <div class="col-lg-5">
+            <div class="points-overview h-100">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="points-caption">YOUR LOYALTY BALANCE</div>
+                        <div class="points-total mt-3">
+                            {{ balance }}
+                            <span>points</span>
+                        </div>
+                    </div>
+                    <div class="points-symbol">
+                        <i class="bi bi-stars"></i>
+                    </div>
+                </div>
 
-            <dt class="col-sm-3">Your referral code</dt>
-            <dd class="col-sm-9">
-                <span class="badge text-bg-primary fs-6">{{ profile.referral_code }}</span>
-                <div class="form-text">Share this code with someone who wants to join VSLink.</div>
-            </dd>
+                <p class="points-description">
+                    Earn points from purchases and referral activity.
+                    Redeem eligible rewards at checkout.
+                </p>
 
-            <dt class="col-sm-3">Referred by</dt>
-            <dd class="col-sm-9">
-                {% if profile.referrer %}
-                    {{ profile.referrer.user.get_full_name|default:profile.referrer.user.username }}
-                {% else %}
-                    No referrer
-                {% endif %}
-            </dd>
-        </dl>
-    </div>
+                <a href="{% url 'loyalty:purchase_history' %}"
+                   class="points-link">
+                    View points activity
+                    <i class="bi bi-arrow-up-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="row g-3 h-100">
+                <div class="col-sm-4">
+                    <div class="dashboard-stat-card h-100">
+                        <div class="stat-icon stat-icon-blue">
+                            <i class="bi bi-bag-check"></i>
+                        </div>
+                        <div class="stat-value">{{ purchase_count }}</div>
+                        <div class="stat-label">Purchases</div>
+                        <div class="stat-note">Completed purchases</div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="dashboard-stat-card h-100">
+                        <div class="stat-icon stat-icon-purple">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="stat-value">{{ referral_count }}</div>
+                        <div class="stat-label">Direct referrals</div>
+                        <div class="stat-note">Customers you invited</div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <div class="dashboard-stat-card h-100">
+                        <div class="stat-icon stat-icon-teal">
+                            <i class="bi bi-gift"></i>
+                        </div>
+                        <div class="stat-value">{{ eligible_rewards_count }}</div>
+                        <div class="stat-label">Eligible rewards</div>
+                        <div class="stat-note">Available for your balance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="row g-4 dashboard-content">
+        <div class="col-lg-7">
+            <div class="dashboard-panel h-100">
+                <div class="dashboard-panel-heading">
+                    <div>
+                        <h2>Recent purchases</h2>
+                        <p>Your latest completed transactions.</p>
+                    </div>
+
+                    <a href="{% url 'loyalty:purchase_history' %}"
+                       class="panel-link">View all</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table dashboard-table align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Date</th>
+                                <th>Paid</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for purchase in recent_purchases %}
+                                <tr>
+                                    <td>
+                                        <div class="purchase-product">
+                                            <span class="purchase-product-icon">
+                                                <i class="bi bi-box-seam"></i>
+                                            </span>
+                                            <span>{{ purchase.product_name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted small">
+                                        {{ purchase.purchased_at|date:"d M Y" }}
+                                    </td>
+                                    <td class="fw-semibold">
+                                        ₹{{ purchase.price_paid|floatformat:2 }}
+                                    </td>
+                                    <td>
+                                        <span class="points-earned">
+                                            +{{ purchase.points_earned }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="dashboard-empty">
+                                            <i class="bi bi-bag"></i>
+                                            <h3>No purchases yet</h3>
+                                            <p>Make your first purchase to start earning points.</p>
+                                            <a href="{% url 'loyalty:catalogue' %}"
+                                               class="btn btn-primary btn-sm">
+                                                Explore products
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="dashboard-panel referral-panel h-100">
+                <div class="dashboard-panel-heading">
+                    <div>
+                        <h2>Your referral code</h2>
+                        <p>Invite customers to join your network.</p>
+                    </div>
+                    <span class="referral-heading-icon">
+                        <i class="bi bi-diagram-3"></i>
+                    </span>
+                </div>
+
+                <div class="referral-code-box">
+                    <label for="referral-code-input">YOUR UNIQUE CODE</label>
+                    <div class="referral-code-controls">
+                        <input id="referral-code-input"
+                               class="form-control"
+                               value="{{ profile.referral_code }}"
+                               readonly>
+                        <button id="copy-referral-code"
+                                class="btn btn-primary"
+                                type="button"
+                                aria-label="Copy referral code">
+                            <i class="bi bi-copy"></i>
+                        </button>
+                    </div>
+                    <div id="copy-referral-status"
+                         class="copy-status"
+                         aria-live="polite"></div>
+                </div>
+
+                <div class="referral-detail">
+                    <span class="referral-detail-icon">
+                        <i class="bi bi-person-check"></i>
+                    </span>
+                    <div>
+                        <div class="referral-detail-label">Referred by</div>
+                        <div class="referral-detail-value">
+                            {% if profile.referrer %}
+                                {{ profile.referrer.user.get_full_name|default:profile.referrer.user.username }}
+                            {% else %}
+                                No referrer linked
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="referral-detail">
+                    <span class="referral-detail-icon">
+                        <i class="bi bi-people"></i>
+                    </span>
+                    <div>
+                        <div class="referral-detail-label">Your network</div>
+                        <div class="referral-detail-value">
+                            {{ referral_count }} direct
+                            referral{{ referral_count|pluralize }}
+                        </div>
+                    </div>
+                </div>
+
+                <a href="{% url 'accounts:referral_tree' %}"
+                   class="btn btn-outline-primary w-100 mt-3">
+                    Explore referral network
+                    <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="dashboard-panel activity-panel">
+        <div class="dashboard-panel-heading">
+            <div>
+                <h2>Recent points activity</h2>
+                <p>A breakdown of points earned and redeemed.</p>
+            </div>
+            <a href="{% url 'loyalty:purchase_history' %}"
+               class="panel-link">Full history</a>
+        </div>
+
+        <div class="activity-list">
+            {% for item in recent_transactions %}
+                <div class="activity-row">
+                    <span class="activity-icon
+                        {% if item.points < 0 %}activity-icon-red
+                        {% else %}activity-icon-green{% endif %}">
+                        {% if item.points < 0 %}
+                            <i class="bi bi-arrow-down-left"></i>
+                        {% else %}
+                            <i class="bi bi-arrow-up-right"></i>
+                        {% endif %}
+                    </span>
+
+                    <div class="activity-description">
+                        <strong>{{ item.get_type_display }}</strong>
+                        <span>
+                            {% if item.description %}
+                                {{ item.description }}
+                            {% elif item.purchase %}
+                                {{ item.purchase.product_name }}
+                            {% else %}
+                                Points account activity
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="activity-date">
+                        {{ item.created_at|date:"d M Y" }}
+                    </div>
+
+                    <div class="activity-points
+                        {% if item.points < 0 %}text-danger
+                        {% else %}text-success{% endif %}">
+                        {% if item.points > 0 %}+{% endif %}{{ item.points }}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="dashboard-empty">
+                    <i class="bi bi-clock-history"></i>
+                    <h3>No points activity yet</h3>
+                    <p>Your loyalty activity will appear here.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="dashboard-quick-links">
+        <a href="{% url 'loyalty:catalogue' %}" class="quick-link-card">
+            <span class="quick-link-icon"><i class="bi bi-bag"></i></span>
+            <span>
+                <strong>Explore products</strong>
+                <small>Find your next purchase</small>
+            </span>
+            <i class="bi bi-arrow-up-right quick-link-arrow"></i>
+        </a>
+
+        <a href="{% url 'loyalty:purchase_history' %}" class="quick-link-card">
+            <span class="quick-link-icon"><i class="bi bi-receipt"></i></span>
+            <span>
+                <strong>Purchase history</strong>
+                <small>Review purchases and points</small>
+            </span>
+            <i class="bi bi-arrow-up-right quick-link-arrow"></i>
+        </a>
+
+        <a href="{% url 'accounts:referral_tree' %}" class="quick-link-card">
+            <span class="quick-link-icon"><i class="bi bi-diagram-3"></i></span>
+            <span>
+                <strong>Referral network</strong>
+                <small>View your referral connections</small>
+            </span>
+            <i class="bi bi-arrow-up-right quick-link-arrow"></i>
+        </a>
+    </section>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (() => {
+        const button = document.getElementById("copy-referral-code");
+        const input = document.getElementById("referral-code-input");
+        const status = document.getElementById("copy-referral-status");
+
+        if (!button || !input || !status) return;
+
+        button.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(input.value);
+                status.textContent = "Referral code copied.";
+            } catch (error) {
+                input.focus();
+                input.select();
+                const copied = document.execCommand("copy");
+                status.textContent = copied
+                    ? "Referral code copied."
+                    : "Select the code and copy it manually.";
+            }
+        });
+    })();
+</script>
 {% endblock %}
