@@ -54,4 +54,9 @@ urlpatterns = [
         views.referral_config_view,
         name="referral_config",
     ),
+    path(
+        "staff/customers/",
+        views.staff_customers_view,
+        name="staff_customers",
+    ),
 ]

@@ -7,7 +7,17 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
 from django.db import transaction, IntegrityError
-from django.db.models import Sum
+from django.db.models import (
+    Count,
+    DecimalField,
+    IntegerField,
+    OuterRef,
+    Q,
+    Subquery,
+    Sum,
+    Value,
+)
+from django.db.models.functions import Coalesce
 from django.http import Http404
 
 from .forms import ProductForm, RewardForm, ReferralConfigForm
@@ -64,6 +74,109 @@ def staff_products_view(request):
         {"products": products},
     )
 
+@staff_required
+def staff_customers_view(request):
+    search_query = request.GET.get("q", "").strip()
+
+    # Aggregate purchases separately so purchase joins cannot multiply
+    # the customer's points transactions.
+    purchase_summary = (
+        Purchase.objects
+        .filter(customer_id=OuterRef("user_id"))
+        .order_by()
+        .values("customer_id")
+        .annotate(
+            purchase_count=Count("pk"),
+            purchase_total=Sum("price_paid"),
+        )
+    )
+
+    points_summary = (
+        PointsTransaction.objects
+        .filter(customer_id=OuterRef("user_id"))
+        .order_by()
+        .values("customer_id")
+        .annotate(balance=Sum("points"))
+        .values("balance")[:1]
+    )
+
+    customers = (
+        CustomerProfile.objects
+        .select_related("user")
+        .annotate(
+            direct_referrals_count=Count("referrals", distinct=True),
+            purchase_count=Coalesce(
+                Subquery(
+                    purchase_summary.values("purchase_count")[:1],
+                    output_field=IntegerField(),
+                ),
+                Value(0),
+                output_field=IntegerField(),
+            ),
+            total_spent=Coalesce(
+                Subquery(
+                    purchase_summary.values("purchase_total")[:1],
+                    output_field=DecimalField(
+                        max_digits=12,
+                        decimal_places=2,
+                    ),
+                ),
+                Value(
+                    Decimal("0.00"),
+                    output_field=DecimalField(
+                        max_digits=12,
+                        decimal_places=2,
+                    ),
+                ),
+                output_field=DecimalField(
+                    max_digits=12,
+                    decimal_places=2,
+                ),
+            ),
+            points_balance=Coalesce(
+                Subquery(
+                    points_summary,
+                    output_field=IntegerField(),
+                ),
+                Value(0),
+                output_field=IntegerField(),
+            ),
+        )
+    )
+
+    if search_query:
+        customers = customers.filter(
+            Q(user__username__icontains=search_query)
+            | Q(user__first_name__icontains=search_query)
+            | Q(user__last_name__icontains=search_query)
+            | Q(user__email__icontains=search_query)
+            | Q(phone__icontains=search_query)
+            | Q(referral_code__icontains=search_query)
+        )
+
+    customers = customers.order_by(
+        "user__last_name",
+        "user__first_name",
+        "user__username",
+    )
+
+    total_points = (
+        PointsTransaction.objects
+        .aggregate(total=Sum("points"))["total"]
+        or 0
+    )
+
+    return render(
+        request,
+        "loyalty/staff_customers.html",
+        {
+            "customer_profiles": customers,
+            "search_query": search_query,
+            "total_customers": CustomerProfile.objects.count(),
+            "total_purchases": Purchase.objects.count(),
+            "points_in_circulation": total_points,
+        },
+    )
 
 @staff_required
 def product_create_view(request):

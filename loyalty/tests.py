@@ -366,3 +366,129 @@ class LoyaltyCheckoutRuleTests(TestCase):
             purchase.price_paid,
             Decimal("350.00"),
         )
+
+class StaffCustomerReportTests(TestCase):
+    def setUp(self):
+        self.staff = User.objects.create_user(
+            username="report_staff",
+            password="test-password-123",
+            is_staff=True,
+        )
+
+        self.customer = User.objects.create_user(
+            username="report_customer",
+            first_name="Report",
+            last_name="Customer",
+            email="report@example.com",
+            password="test-password-123",
+        )
+
+        self.profile = CustomerProfile.objects.create(
+            user=self.customer,
+            phone="9876543210",
+        )
+
+        referred_user = User.objects.create_user(
+            username="report_referral",
+            password="test-password-123",
+        )
+        CustomerProfile.objects.create(
+            user=referred_user,
+            referrer=self.profile,
+        )
+
+        product = Product.objects.create(
+            name="Report Product",
+            description="Product for report tests.",
+            price=Decimal("125.00"),
+            points=20,
+            is_active=True,
+        )
+
+        self.purchase = Purchase.objects.create(
+            customer=self.customer,
+            product=product,
+            product_name=product.name,
+            base_price=Decimal("125.00"),
+            price_paid=Decimal("100.00"),
+            discount_amount=Decimal("25.00"),
+            points_earned=20,
+        )
+
+        PointsTransaction.objects.create(
+            customer=self.customer,
+            purchase=self.purchase,
+            type=PointsTransaction.TransactionType.PURCHASE,
+            points=20,
+            description="Test purchase points",
+        )
+
+        PointsTransaction.objects.create(
+            customer=self.customer,
+            purchase=self.purchase,
+            type=PointsTransaction.TransactionType.REDEMPTION,
+            points=-5,
+            description="Test points redemption",
+        )
+
+        self.client.force_login(self.staff)
+        self.report_url = reverse("loyalty:staff_customers")
+
+    def test_staff_can_view_customer_summary(self):
+        response = self.client.get(self.report_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "report@example.com")
+        self.assertContains(response, self.profile.referral_code)
+
+        customer_row = next(
+            profile
+            for profile in response.context["customer_profiles"]
+            if profile.pk == self.profile.pk
+        )
+
+        self.assertEqual(customer_row.direct_referrals_count, 1)
+        self.assertEqual(customer_row.purchase_count, 1)
+        self.assertEqual(
+            customer_row.total_spent,
+            Decimal("100.00"),
+        )
+        self.assertEqual(customer_row.points_balance, 15)
+
+    def test_staff_can_search_customer_records(self):
+        response = self.client.get(
+            self.report_url,
+            {"q": "report@example.com"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "report@example.com")
+        self.assertEqual(
+            list(response.context["customer_profiles"]),
+            [
+                response.context["customer_profiles"].get(
+                    pk=self.profile.pk
+                )
+            ],
+        )
+
+    def test_non_staff_customer_cannot_access_reports(self):
+        self.client.force_login(self.customer)
+
+        response = self.client.get(self.report_url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.url,
+            reverse("loyalty:catalogue"),
+        )
+
+    def test_anonymous_user_is_redirected_to_login(self):
+        self.client.logout()
+
+        response = self.client.get(self.report_url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            response.url.startswith(reverse("accounts:login"))
+        )

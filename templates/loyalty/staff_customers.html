@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Reports | VSLink{% endblock %}
+
+{% block content %}
+<div class="staff-page staff-customers-page">
+
+    <section class="staff-page-header">
+        <div>
+            <div class="section-kicker">STAFF WORKSPACE</div>
+            <h1>Customer reports</h1>
+            <p>
+                Review customer accounts, purchase activity, loyalty balances,
+                and referral networks.
+            </p>
+        </div>
+    </section>
+
+    <nav class="staff-tabs" aria-label="Staff navigation">
+        <a class="staff-tab"
+           href="{% url 'loyalty:staff_products' %}">
+            <i class="bi bi-box-seam me-2"></i>Products
+        </a>
+        <a class="staff-tab"
+           href="{% url 'loyalty:staff_rewards' %}">
+            <i class="bi bi-gift me-2"></i>Rewards
+        </a>
+        <a class="staff-tab"
+           href="{% url 'loyalty:referral_config' %}">
+            <i class="bi bi-diagram-3 me-2"></i>Referral settings
+        </a>
+        <a class="staff-tab staff-tab-active"
+           href="{% url 'loyalty:staff_customers' %}">
+            <i class="bi bi-people me-2"></i>Customers
+        </a>
+    </nav>
+
+    <section class="staff-metrics">
+        <article class="staff-metric">
+            <span class="staff-metric-icon staff-metric-blue">
+                <i class="bi bi-people"></i>
+            </span>
+            <div>
+                <span class="staff-metric-label">Registered customers</span>
+                <strong>{{ total_customers }}</strong>
+            </div>
+        </article>
+
+        <article class="staff-metric">
+            <span class="staff-metric-icon staff-metric-purple">
+                <i class="bi bi-bag-check"></i>
+            </span>
+            <div>
+                <span class="staff-metric-label">Recorded purchases</span>
+                <strong>{{ total_purchases }}</strong>
+            </div>
+        </article>
+
+        <article class="staff-metric">
+            <span class="staff-metric-icon staff-metric-green">
+                <i class="bi bi-stars"></i>
+            </span>
+            <div>
+                <span class="staff-metric-label">Net points balance</span>
+                <strong>{{ points_in_circulation }}</strong>
+            </div>
+        </article>
+    </section>
+
+    <section class="staff-table-panel">
+
+        <div class="staff-table-heading">
+            <div>
+                <h2>Customer directory</h2>
+                <p>
+                    Search customer records and inspect their account summaries.
+                </p>
+            </div>
+            <span class="staff-count-badge">
+                {{ customer_profiles|length }} shown
+            </span>
+        </div>
+
+        <form method="get" class="staff-customer-filter">
+            <label for="customer-search" class="visually-hidden">
+                Search customers
+            </label>
+
+            <div class="staff-customer-search">
+                <span class="staff-customer-search-icon">
+                    <i class="bi bi-search"></i>
+                </span>
+
+                <input
+                    id="customer-search"
+                    type="search"
+                    name="q"
+                    value="{{ search_query }}"
+                    class="form-control"
+                    placeholder="Search by name, email, phone, username, or referral code"
+                >
+
+                <button type="submit" class="btn btn-primary">
+                    Search
+                </button>
+            </div>
+
+            {% if search_query %}
+                <a href="{% url 'loyalty:staff_customers' %}"
+                   class="btn btn-outline-secondary">
+                    Clear
+                </a>
+            {% endif %}
+        </form>
+
+        <div class="table-responsive">
+            <table class="table staff-table staff-customer-table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Referral code</th>
+                        <th>Joined</th>
+                        <th>Direct referrals</th>
+                        <th>Purchases</th>
+                        <th>Total spent</th>
+                        <th>Points balance</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for customer in customer_profiles %}
+                    <tr>
+                        <td>
+                            <div class="staff-record">
+                                <span class="staff-record-icon">
+                                    <i class="bi bi-person"></i>
+                                </span>
+
+                                <div class="staff-customer-contact">
+                                    <strong>
+                                        {{ customer.user.get_full_name|default:customer.user.username }}
+                                    </strong>
+                                    <small>{{ customer.user.email|default:"No email provided" }}</small>
+                                    <small>
+                                        @{{ customer.user.username }}
+                                        {% if customer.phone %}
+                                            · {{ customer.phone }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <td>
+                            <code class="staff-referral-code">
+                                {{ customer.referral_code }}
+                            </code>
+                        </td>
+
+                        <td>{{ customer.created_at|date:"d M Y" }}</td>
+
+                        <td>{{ customer.direct_referrals_count }}</td>
+
+                        <td>{{ customer.purchase_count }}</td>
+
+                        <td class="staff-price">
+                            ₹{{ customer.total_spent|floatformat:2 }}
+                        </td>
+
+                        <td>
+                            <span class="staff-points-pill">
+                                <i class="bi bi-stars me-1"></i>
+                                {{ customer.points_balance }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="staff-customer-actions">
+                                <a
+                                    class="btn btn-sm btn-outline-primary"
+                                    href="{% url 'accounts:referral_tree' %}?customer_id={{ customer.pk }}"
+                                >
+                                    <i class="bi bi-diagram-3 me-1"></i>
+                                    View network
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="8">
+                            <div class="staff-empty-state">
+                                <span>
+                                    <i class="bi bi-people"></i>
+                                </span>
+                                <h3>No matching customers</h3>
+                                <p>
+                                    {% if search_query %}
+                                        Try a different search term or clear your search.
+                                    {% else %}
+                                        Registered customer profiles will appear here.
+                                    {% endif %}
+                                </p>
+
+                                {% if search_query %}
+                                    <a
+                                        href="{% url 'loyalty:staff_customers' %}"
+                                        class="btn btn-outline-primary"
+                                    >
+                                        Clear search
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="staff-table-footer">
+            <i class="bi bi-shield-lock me-2"></i>
+            Customer reports are available only to authorized staff accounts.
+            Points balances are calculated from the transaction ledger.
+        </div>
+    </section>
+</div>
+{% endblock %}
