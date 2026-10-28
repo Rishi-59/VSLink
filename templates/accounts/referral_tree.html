@@ -1,164 +1,211 @@
+
 {% extends "base.html" %}
 
-{% block title %}Referral Tree | VSLink{% endblock %}
+{% block title %}Referral Network | VSLink{% endblock %}
 
 {% block content %}
-<div class="mb-4">
-    <h1 class="h3">Referral Tree</h1>
-    <p class="text-muted mb-0">
-        Explore the referral relationships in your VSLink network.
-    </p>
-</div>
+<div class="referral-page">
 
-{% if user.is_staff %}
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <form method="get" class="row g-3 align-items-end">
-            <div class="col-md-8">
-                <label for="customer_id" class="form-label">
-                    View customer's referral tree
-                </label>
-                <select name="customer_id" id="customer_id"
-                        class="form-select">
-                    <option value="">My tree</option>
-                    {% for customer in customer_profiles %}
-                    <option value="{{ customer.pk }}">
-                        {% if customer.pk == selected_profile.pk %}
-                        selected
-                        {% endif %}>
+    <section class="referral-page-header">
+        <div>
+            <div class="section-kicker">YOUR VSLink COMMUNITY</div>
+            <h1>Referral network</h1>
+            <p>
+                Explore your referral relationships, discover who's connected
+                to your network, and see how each branch grows.
+            </p>
+        </div>
+
+        {% if not user.is_staff %}
+            <a href="{% url 'accounts:profile' %}"
+               class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>My dashboard
+            </a>
+        {% endif %}
+    </section>
+
+    {% if user.is_staff %}
+    <section class="referral-selector-panel">
+        <div class="referral-selector-icon">
+            <i class="bi bi-people"></i>
+        </div>
+        <div class="referral-selector-copy">
+            <h2>Explore a customer network</h2>
+            <p>Select a customer to inspect their referral relationships.</p>
+        </div>
+
+        <form method="get" class="referral-selector-form">
+            <label for="customer_id" class="visually-hidden">
+                Select customer
+            </label>
+            <select name="customer_id" id="customer_id" class="form-select">
+                <option value=""
+                    {% if selected_profile.pk == own_profile_id %}selected{% endif %}>
+                    My own tree
+                </option>
+
+                {% for customer in customer_profiles %}
+                    <option value="{{ customer.pk }}"
+                        {% if customer.pk == selected_profile.pk %}selected{% endif %}>
                         {{ customer.user.get_full_name|default:customer.user.username }}
+                        {% if customer.pk == own_profile_id %}(You){% endif %}
                         — {{ customer.referral_code }}
                     </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-4">
-                <button class="btn btn-primary" type="submit">
-                    View Tree
-                </button>
-            </div>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-primary">
+                View network
+            </button>
         </form>
-    </div>
-</div>
-{% endif %}
+    </section>
+    {% endif %}
 
-<div class="card shadow-sm mb-4">
-    <div class="card-body">
-        <h2 class="h5">Your referral chain</h2>
-
-        {% if ancestors %}
-        <div class="d-flex flex-wrap align-items-center gap-2">
-            {% for ancestor in ancestors %}
-            <span class="badge text-bg-secondary p-2">
-                        {{ ancestor.user.get_full_name|default:ancestor.user.username }}
-                    </span>
-            <span class="text-muted">→</span>
-            {% endfor %}
-
-            <span class="badge text-bg-primary p-2">
-                    {{ selected_profile.user.get_full_name|default:selected_profile.user.username }}
-                    {% if selected_profile.pk == user.customer_profile.pk %}
-                        (You)
+    <section class="referral-summary-grid">
+        <article class="referral-summary-card">
+            <span class="referral-summary-icon referral-summary-blue">
+                <i class="bi bi-person-check"></i>
+            </span>
+            <div>
+                <span class="referral-summary-label">Selected customer</span>
+                <strong class="referral-summary-name">
+                    {% if selected_profile.pk == own_profile_id %}
+                        Your account
+                    {% else %}
+                        {{ selected_profile.user.get_full_name|default:selected_profile.user.username }}
                     {% endif %}
+                </strong>
+                <span class="referral-summary-note">
+                    Code: {{ selected_profile.referral_code }}
                 </span>
+            </div>
+        </article>
+
+        <article class="referral-summary-card">
+            <span class="referral-summary-icon referral-summary-purple">
+                <i class="bi bi-people"></i>
+            </span>
+            <div>
+                <span class="referral-summary-label">Direct referrals</span>
+                <strong class="referral-summary-number">
+                    {{ selected_profile.referrals.count }}
+                </strong>
+                <span class="referral-summary-note">
+                    Customers invited directly
+                </span>
+            </div>
+        </article>
+
+        <article class="referral-summary-card">
+            <span class="referral-summary-icon referral-summary-teal">
+                <i class="bi bi-diagram-3"></i>
+            </span>
+            <div>
+                <span class="referral-summary-label">Upstream levels</span>
+                <strong class="referral-summary-number">{{ ancestors|length }}</strong>
+                <span class="referral-summary-note">
+                    Referrer levels above this account
+                </span>
+            </div>
+        </article>
+    </section>
+
+    <section class="referral-panel">
+        <div class="referral-panel-heading">
+            <div>
+                <div class="section-kicker">REFERRAL RELATIONSHIPS</div>
+                <h2>Referral lineage</h2>
+                <p>
+                    The chain of referrers leading to the selected customer.
+                </p>
+            </div>
+            <span class="referral-panel-heading-icon">
+                <i class="bi bi-signpost-split"></i>
+            </span>
         </div>
-        {% else %}
-        <p class="text-muted mb-0">
-            {% if selected_profile.pk == user.customer_profile.pk %}
-            You have no referrer above you.
-            {% else %}
-            This customer has no referrer above them.
+
+        <div class="referral-lineage">
+            {% if ancestors %}
+                {% for ancestor in ancestors %}
+                    <div class="referral-lineage-item">
+                        <span class="referral-lineage-avatar">
+                            <i class="bi bi-person"></i>
+                        </span>
+                        <span class="referral-lineage-name">
+                            {{ ancestor.user.get_full_name|default:ancestor.user.username }}
+                        </span>
+                        <span class="referral-lineage-code">
+                            {{ ancestor.referral_code }}
+                        </span>
+                    </div>
+                    <i class="bi bi-arrow-right referral-lineage-arrow"></i>
+                {% endfor %}
             {% endif %}
-        </p>
+
+            <div class="referral-lineage-item referral-lineage-selected">
+                <span class="referral-lineage-avatar">
+                    <i class="bi bi-person-check"></i>
+                </span>
+                <span class="referral-lineage-name">
+                    {{ selected_profile.user.get_full_name|default:selected_profile.user.username }}
+                    {% if selected_profile.pk == own_profile_id %}(You){% endif %}
+                </span>
+                <span class="referral-lineage-code">
+                    {{ selected_profile.referral_code }}
+                </span>
+            </div>
+        </div>
+
+        {% if not ancestors %}
+            <p class="referral-lineage-note">
+                <i class="bi bi-info-circle me-1"></i>
+                This customer has no referrer above them.
+            </p>
         {% endif %}
-    </div>
+    </section>
+
+    <section class="referral-panel referral-hierarchy-panel">
+        <div class="referral-panel-heading">
+            <div>
+                <div class="section-kicker">NETWORK STRUCTURE</div>
+                <h2>Referral hierarchy</h2>
+                <p>
+                    Each level below a customer contains their direct referrals.
+                </p>
+            </div>
+
+            <span class="referral-hierarchy-badge">
+                <i class="bi bi-diagram-3 me-1"></i>
+                Tree view
+            </span>
+        </div>
+
+        <div class="referral-hierarchy-content">
+            <div class="referral-tree-legend">
+                <span><i class="legend-dot legend-dot-selected"></i> Selected customer</span>
+                <span><i class="legend-dot legend-dot-member"></i> Network member</span>
+                <span class="referral-tree-hint">
+                    <i class="bi bi-arrow-down"></i>
+                    Referrals continue downward
+                </span>
+            </div>
+
+            <ul class="referral-tree">
+                {% include "accounts/_referral_node.html" with node=tree root_profile=selected_profile own_profile_id=own_profile_id %}
+            </ul>
+
+            {% if not tree.children %}
+                <div class="referral-tree-empty">
+                    <span><i class="bi bi-diagram-3"></i></span>
+                    <h3>This network is ready to grow</h3>
+                    <p>
+                        No direct referrals have joined under this customer yet.
+                        New referral relationships will appear here.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
 </div>
-
-<div class="card shadow-sm">
-    <div class="card-body">
-        <h2 class="h5 mb-3">
-            Referral network starting from
-            {{ selected_profile.user.get_full_name|default:selected_profile.user.username }}
-        </h2>
-
-        <p class="text-muted small">
-            Each nested level represents customers referred by the level above.
-        </p>
-
-        <ul class="referral-tree">
-            {% include "accounts/_referral_node.html" with node=tree root_profile=selected_profile %}
-        </ul>
-    </div>
-</div>
-
-<style>
-    .referral-tree,
-    .referral-tree ul {
-        list-style: none;
-        margin: 0;
-        padding-left: 1.5rem;
-    }
-
-    .referral-tree {
-        padding-left: 0;
-    }
-
-    .referral-tree ul {
-        border-left: 2px solid #dee2e6;
-        margin-left: 0.75rem;
-    }
-
-    .referral-tree li {
-        position: relative;
-        padding: 0.45rem 0;
-    }
-
-    .referral-node {
-        display: inline-block;
-        border: 1px solid #dee2e6;
-        border-radius: 0.5rem;
-        padding: 0.65rem 0.85rem;
-        background: #fff;
-    }
-
-    .referral-node-you {
-        border-color: #0d6efd;
-        background: #eaf2ff;
-    }
-
-    /* Force referral tree into a vertical hierarchy */
-    .referral-tree,
-    .referral-tree ul {
-        display: block !important;
-        list-style: none;
-        margin-top: 0;
-        margin-bottom: 0;
-        padding-left: 28px;
-    }
-
-    .referral-tree {
-        padding-left: 0;
-    }
-
-    .referral-tree li {
-        display: block !important;
-        width: 100%;
-        margin: 12px 0;
-        padding: 0;
-    }
-
-    .referral-tree ul {
-        display: block !important;
-        border-left: 2px solid #dee2e6;
-        margin-left: 12px;
-        padding-left: 24px;
-    }
-
-    .referral-tree li > div,
-    .referral-tree li > .referral-node {
-        display: block;
-        width: fit-content;
-        max-width: 100%;
-    }
-</style>
 {% endblock %}
