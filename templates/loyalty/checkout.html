@@ -1,49 +1,279 @@
- {% extends "base.html" %}
+
+{% extends "base.html" %}
+
 {% block title %}Checkout | VSLink{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-7">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h1 class="h3 mb-3">Checkout</h1>
+<div class="checkout-page">
 
-                <h2 class="h5">{{ product.name }}</h2>
-                <p class="text-muted">{{ product.description }}</p>
-                <p>Price: <strong>₹{{ product.price }}</strong></p>
-                <p>Points earned: <strong>{{ product.points }}</strong></p>
-                <p>Available points: <strong>{{ balance }}</strong></p>
+    <nav class="checkout-breadcrumb" aria-label="Breadcrumb">
+        <a href="{% url 'loyalty:catalogue' %}">
+            <i class="bi bi-grid me-1"></i> Products
+        </a>
+        <i class="bi bi-chevron-right"></i>
+        <span>Checkout</span>
+    </nav>
 
-                <form method="post">
-                    {% csrf_token %}
+    <div class="checkout-page-heading">
+        <div class="section-kicker">ALMOST YOURS</div>
+        <h1>Review your purchase</h1>
+        <p>Confirm your product and choose an eligible reward before completing checkout.</p>
+    </div>
 
-                    <label class="form-label" for="reward_id">
-                        Optional reward
-                    </label>
-                    <select class="form-select mb-3" name="reward_id" id="reward_id">
-                        <option value="">No reward</option>
-                        {% for reward in rewards %}
-                            <option value="{{ reward.pk }}">
-                                {{ reward.name }} — {{ reward.points_required }} points
-                            </option>
-                        {% endfor %}
-                    </select>
+    <div class="row g-4 align-items-start">
 
-                    <p class="small text-muted">
-                        This is a simulated checkout. No payment will be taken.
-                        Applying a reward deducts its required points.
+        <div class="col-lg-7">
+            <section class="checkout-product-card">
+                <div class="checkout-product-art">
+                    <div class="checkout-product-art-orb checkout-product-art-orb-one"></div>
+                    <div class="checkout-product-art-orb checkout-product-art-orb-two"></div>
+
+                    <span class="checkout-art-badge">
+                        <i class="bi bi-bag-check me-1"></i>
+                        Ready to purchase
+                    </span>
+
+                    <div class="checkout-product-art-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+
+                    <div class="checkout-art-bottom">
+                        <span>VSLink collection</span>
+                        <i class="bi bi-stars"></i>
+                    </div>
+                </div>
+
+                <div class="checkout-product-details">
+                    <div class="section-kicker">PRODUCT DETAILS</div>
+                    <h2>{{ product.name }}</h2>
+
+                    <p class="checkout-product-description">
+                        {{ product.description|default:"Complete your purchase and earn loyalty points with VSLink." }}
                     </p>
 
-                    <button type="submit" class="btn btn-primary">
-                        Confirm purchase
-                    </button>
-                    <a class="btn btn-outline-secondary"
-                       href="{% url 'loyalty:catalogue' %}">
-                        Cancel
-                    </a>
-                </form>
+                    <div class="checkout-product-price">
+                        ₹{{ product.price|floatformat:2 }}
+                    </div>
+
+                    <div class="checkout-product-perks">
+                        <div>
+                            <span class="checkout-perk-icon">
+                                <i class="bi bi-stars"></i>
+                            </span>
+                            <span>
+                                <strong>+{{ product.points }} points</strong>
+                                <small>Earned from this purchase</small>
+                            </span>
+                        </div>
+
+                        <div>
+                            <span class="checkout-perk-icon checkout-perk-icon-purple">
+                                <i class="bi bi-gift"></i>
+                            </span>
+                            <span>
+                                <strong>Eligible rewards</strong>
+                                <small>Apply available points at checkout</small>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="checkout-info-note mt-4">
+                <span class="checkout-info-icon">
+                    <i class="bi bi-info-circle"></i>
+                </span>
+                <div>
+                    <strong>This is a simulated checkout</strong>
+                    <p class="mb-0">
+                        No payment will be collected. Confirming this purchase
+                        records the purchase and updates applicable loyalty points.
+                    </p>
+                </div>
             </div>
         </div>
+
+        <div class="col-lg-5">
+            <section class="checkout-summary-card"
+                     id="checkout-pricing"
+                     data-price="{{ product.price }}">
+                <div class="checkout-summary-header">
+                    <div>
+                        <div class="section-kicker">ORDER SUMMARY</div>
+                        <h2>Complete your order</h2>
+                    </div>
+                    <span class="checkout-summary-icon">
+                        <i class="bi bi-receipt"></i>
+                    </span>
+                </div>
+
+                <form method="post" class="checkout-form">
+                    {% csrf_token %}
+
+                    <div class="checkout-order-product">
+                        <span class="checkout-order-icon">
+                            <i class="bi bi-box-seam"></i>
+                        </span>
+                        <div>
+                            <strong>{{ product.name }}</strong>
+                            <span>Quantity: 1</span>
+                        </div>
+                        <b>₹{{ product.price|floatformat:2 }}</b>
+                    </div>
+
+                    <div class="checkout-points-balance">
+                        <span>
+                            <i class="bi bi-stars me-2"></i>
+                            Available points
+                        </span>
+                        <strong>{{ balance }}</strong>
+                    </div>
+
+                    <div class="checkout-reward-section">
+                        <label for="reward_id" class="checkout-field-label">
+                            Apply a reward
+                            <span>Optional</span>
+                        </label>
+
+                        <select class="form-select checkout-reward-select"
+                                name="reward_id"
+                                id="reward_id">
+                            <option value=""
+                                    data-discount-type="NONE"
+                                    data-discount-value="0"
+                                    data-max-discount="0"
+                                    data-points="0">
+                                No reward — pay full price
+                            </option>
+
+                            {% for reward in rewards %}
+                                <option value="{{ reward.pk }}"
+                                        data-discount-type="{{ reward.discount_type }}"
+                                        data-discount-value="{{ reward.discount_value }}"
+                                        data-max-discount="{{ reward.max_discount_amount|default_if_none:'0' }}"
+                                        data-points="{{ reward.points_required }}">
+                                    {{ reward.name }} — {{ reward.points_required }} points
+                                    {% if reward.discount_type == "FIXED" %}
+                                        (₹{{ reward.discount_value|floatformat:2 }} off)
+                                    {% else %}
+                                        ({{ reward.discount_value|floatformat:2 }}% off, capped at ₹{{ reward.max_discount_amount|floatformat:2 }})
+                                    {% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+
+                        {% if rewards %}
+                            <p class="checkout-field-help">
+                                Choose an eligible reward to see the estimated discount.
+                            </p>
+                        {% else %}
+                            <p class="checkout-field-help">
+                                No rewards are currently available for your points balance.
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <div class="checkout-points-deduction">
+                        <span>
+                            <i class="bi bi-arrow-down-circle me-2"></i>
+                            Points used
+                        </span>
+                        <strong id="checkout-points-used">0 points</strong>
+                    </div>
+
+                    <div class="checkout-totals">
+                        <div>
+                            <span>Subtotal</span>
+                            <strong id="checkout-subtotal">
+                                ₹{{ product.price|floatformat:2 }}
+                            </strong>
+                        </div>
+                        <div class="checkout-discount-row">
+                            <span>Estimated discount</span>
+                            <strong id="checkout-discount">−₹0.00</strong>
+                        </div>
+                    </div>
+
+                    <div class="checkout-total-row" aria-live="polite">
+                        <span>Estimated total</span>
+                        <strong id="checkout-total">
+                            ₹{{ product.price|floatformat:2 }}
+                        </strong>
+                    </div>
+
+                    <p class="checkout-estimate-note">
+                        The displayed discount is an estimate. The server calculates
+                        the final amount when you confirm the purchase.
+                    </p>
+
+                    <button type="submit"
+                            class="btn btn-primary btn-lg w-100 checkout-confirm-button">
+                        Confirm purchase
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+
+                    <a href="{% url 'loyalty:catalogue' %}"
+                       class="checkout-cancel-link">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Back to products
+                    </a>
+                </form>
+            </section>
+        </div>
+
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (() => {
+        const summary = document.getElementById("checkout-pricing");
+        const select = document.getElementById("reward_id");
+
+        if (!summary || !select) return;
+
+        const subtotal = Number(summary.dataset.price);
+        const discountElement = document.getElementById("checkout-discount");
+        const totalElement = document.getElementById("checkout-total");
+        const pointsUsedElement = document.getElementById("checkout-points-used");
+
+        const money = new Intl.NumberFormat("en-IN", {
+            style: "currency",
+            currency: "INR",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        function updateSummary() {
+            const option = select.options[select.selectedIndex];
+            const type = option.dataset.discountType || "NONE";
+            const value = Number(option.dataset.discountValue || 0);
+            const cap = Number(option.dataset.maxDiscount || 0);
+            const points = Number(option.dataset.points || 0);
+
+            let discount = 0;
+
+            if (type === "FIXED") {
+                discount = value;
+            } else if (type === "PERCENTAGE") {
+                discount = subtotal * value / 100;
+                if (cap > 0) discount = Math.min(discount, cap);
+            }
+
+            discount = Math.max(0, Math.min(subtotal, discount));
+            discount = Math.floor((discount + 1e-8) * 100) / 100;
+
+            const total = Math.max(0, subtotal - discount);
+
+            discountElement.textContent = "−" + money.format(discount);
+            totalElement.textContent = money.format(total);
+            pointsUsedElement.textContent =
+                points + (points === 1 ? " point" : " points");
+        }
+
+        select.addEventListener("change", updateSummary);
+        updateSummary();
+    })();
+</script>
 {% endblock %}
