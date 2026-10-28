@@ -10,7 +10,7 @@ from django.db import transaction
 from django.db.models import Sum
 from django.http import Http404
 
-from .forms import ProductForm, RewardForm
+from .forms import ProductForm, RewardForm, ReferralConfigForm
 
 from accounts.models import CustomerProfile
 from .models import (
@@ -397,4 +397,28 @@ def staff_rewards_view(request):
         request,
         "loyalty/staff_rewards.html",
         {"rewards": rewards},
+    )
+
+
+@login_required
+@staff_required
+def referral_config_view(request):
+    config, _ = ReferralConfig.objects.get_or_create(pk=1)
+
+    if request.method == "POST":
+        form = ReferralConfigForm(request.POST, instance=config)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request,
+                "Referral bonus settings updated successfully.",
+            )
+            return redirect("loyalty:referral_config")
+    else:
+        form = ReferralConfigForm(instance=config)
+
+    return render(
+        request,
+        "loyalty/referral_config.html",
+        {"form": form},
     )
