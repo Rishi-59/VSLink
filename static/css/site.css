@@ -2848,3 +2848,574 @@ a {
         padding: 1.15rem;
     }
 }
+
+
+/* =========================================
+   PURCHASE HISTORY & POINTS LEDGER
+   ========================================= */
+
+.history-page {
+    display: grid;
+    gap: 1.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 2rem;
+}
+
+.history-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(250px, 0.6fr);
+    align-items: center;
+    gap: 2rem;
+    padding: clamp(1.7rem, 4vw, 3rem);
+    border: 1px solid #e2e7f8;
+    border-radius: 24px;
+    background:
+        radial-gradient(ellipse at 0% 100%, rgba(199, 210, 254, 0.4), transparent 40%),
+        linear-gradient(125deg, #fff, #f6f7ff 70%, #f3efff);
+    box-shadow: var(--vs-shadow);
+}
+
+.history-hero-copy h1 {
+    margin-top: 0.6rem;
+    color: var(--vs-navy);
+    font-size: clamp(2rem, 3.6vw, 2.9rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+}
+
+.history-hero-copy p {
+    max-width: 580px;
+    margin: 0.7rem 0 1.35rem;
+    color: var(--vs-muted);
+    font-size: 0.88rem;
+    line-height: 1.85;
+}
+
+.history-balance-card {
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 19px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(139, 92, 246, 0.4), transparent 40%),
+        linear-gradient(145deg, #172554, #312e81);
+    box-shadow: 0 15px 35px rgba(23, 37, 84, 0.15);
+    color: #fff;
+}
+
+.history-balance-icon {
+    display: grid;
+    width: 43px;
+    height: 43px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ddd6fe;
+    font-size: 1.2rem;
+}
+
+.history-balance-label {
+    display: block;
+    margin-top: 1.15rem;
+    color: #c7d2fe;
+    font-size: 0.67rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.history-balance-value {
+    margin-top: 0.35rem;
+    color: #fff;
+    font-size: clamp(2.1rem, 4vw, 2.8rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.history-balance-value span {
+    color: #c7d2fe;
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.history-balance-caption {
+    margin-top: 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.13);
+    color: #d7def8;
+    font-size: 0.73rem;
+}
+
+.history-balance-caption i {
+    color: #5eead4;
+}
+
+.history-overview {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.history-overview-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.4rem;
+    border: 1px solid var(--vs-border);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 6px 22px rgba(23, 37, 84, 0.03);
+}
+
+.history-overview-icon {
+    display: grid;
+    width: 47px;
+    height: 47px;
+    flex: 0 0 47px;
+    place-items: center;
+    border-radius: 14px;
+    font-size: 1.2rem;
+}
+
+.history-icon-blue {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.history-icon-purple {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.history-overview-label {
+    color: var(--vs-muted);
+    font-size: 0.77rem;
+}
+
+.history-overview-value {
+    margin-top: 0.15rem;
+    color: var(--vs-navy);
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1.25;
+}
+
+.history-overview-note {
+    margin-top: 0.2rem;
+    color: #94a3b8;
+    font-size: 0.7rem;
+}
+
+.history-panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--vs-border);
+    border-radius: 19px;
+    background: #fff;
+    box-shadow: 0 7px 25px rgba(23, 37, 84, 0.035);
+}
+
+.history-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.4rem 1.5rem;
+    border-bottom: 1px solid #eef1f7;
+}
+
+.history-panel-heading h2 {
+    margin: 0.35rem 0 0;
+    color: var(--vs-navy);
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+}
+
+.history-panel-heading p {
+    margin: 0.35rem 0 0;
+    color: var(--vs-muted);
+    font-size: 0.78rem;
+    line-height: 1.7;
+}
+
+.history-heading-icon {
+    display: grid;
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    place-items: center;
+    border-radius: 13px;
+    background: #eef2ff;
+    color: var(--vs-blue);
+    font-size: 1.15rem;
+}
+
+.history-heading-purple {
+    background: #f3e8ff;
+    color: #7c3aed;
+}
+
+.history-table {
+    min-width: 870px;
+}
+
+.history-table thead th {
+    padding: 0.9rem 1.15rem;
+    border-bottom: 1px solid var(--vs-border);
+    background: #fafbff;
+    color: #64748b;
+    font-size: 0.67rem;
+    white-space: nowrap;
+}
+
+.history-table tbody td {
+    padding: 1rem 1.15rem;
+    border-bottom: 1px solid #eef1f7;
+    font-size: 0.78rem;
+}
+
+.history-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.history-table tbody tr:hover {
+    background: #fcfcff;
+}
+
+.history-product {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 155px;
+}
+
+.history-product-icon {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    border-radius: 12px;
+    background: #eef2ff;
+    color: var(--vs-blue);
+    font-size: 1rem;
+}
+
+.history-product-info {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.history-product-info strong {
+    max-width: 190px;
+    overflow: hidden;
+    color: #334155;
+    font-size: 0.79rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-product-info small,
+.history-date small {
+    display: block;
+    margin-top: 0.15rem;
+    color: #94a3b8;
+    font-size: 0.68rem;
+}
+
+.history-date {
+    min-width: 100px;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+.history-money {
+    color: #475569;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.history-paid {
+    color: var(--vs-navy);
+    font-weight: 800;
+}
+
+.history-discount {
+    display: inline-block;
+    padding: 0.35rem 0.45rem;
+    border-radius: 7px;
+    background: #ecfdf5;
+    color: #047857;
+    font-size: 0.73rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.history-no-discount {
+    color: #94a3b8;
+}
+
+.history-points {
+    display: inline-block;
+    padding: 0.38rem 0.5rem;
+    border-radius: 8px;
+    background: #ecfdf5;
+    color: #047857;
+    font-size: 0.73rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.history-panel-footer {
+    padding: 0.95rem 1.4rem;
+    border-top: 1px solid #eef1f7;
+    background: #fafbff;
+    color: #64748b;
+    font-size: 0.72rem;
+    line-height: 1.7;
+}
+
+.history-panel-footer i {
+    color: var(--vs-blue);
+}
+
+.history-empty {
+    padding: 3rem 1.25rem;
+    text-align: center;
+}
+
+.history-empty-icon {
+    display: grid;
+    width: 55px;
+    height: 55px;
+    margin: 0 auto;
+    place-items: center;
+    border-radius: 17px;
+    background: #eef2ff;
+    color: var(--vs-blue);
+    font-size: 1.45rem;
+}
+
+.history-empty h3 {
+    margin-top: 1rem;
+    color: var(--vs-navy);
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.history-empty p {
+    max-width: 430px;
+    margin: 0.4rem auto 1.1rem;
+    color: var(--vs-muted);
+    font-size: 0.8rem;
+    line-height: 1.8;
+}
+
+/* Points ledger */
+
+.history-ledger {
+    padding: 0 1.5rem;
+}
+
+.history-ledger-row {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) 100px auto;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1.15rem 0;
+    border-bottom: 1px solid #eef1f7;
+}
+
+.history-ledger-row:last-child {
+    border-bottom: 0;
+}
+
+.ledger-activity-icon {
+    display: grid;
+    width: 41px;
+    height: 41px;
+    place-items: center;
+    border-radius: 13px;
+    font-size: 1.05rem;
+}
+
+.ledger-icon-green {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.ledger-icon-purple {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.ledger-icon-red {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.ledger-activity-info {
+    display: grid;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.ledger-activity-info strong {
+    color: #334155;
+    font-size: 0.81rem;
+    font-weight: 800;
+}
+
+.ledger-activity-info span {
+    overflow: hidden;
+    color: var(--vs-muted);
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+}
+
+.ledger-activity-info small {
+    color: #94a3b8;
+    font-size: 0.68rem;
+}
+
+.ledger-activity-date {
+    color: #64748b;
+    font-size: 0.74rem;
+    white-space: nowrap;
+}
+
+.ledger-activity-date small {
+    display: block;
+    margin-top: 0.15rem;
+    color: #94a3b8;
+    font-size: 0.68rem;
+}
+
+.ledger-points {
+    text-align: right;
+    font-size: 0.87rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.ledger-points small {
+    display: block;
+    margin-top: 0.15rem;
+    color: #94a3b8;
+    font-size: 0.65rem;
+    font-weight: 500;
+}
+
+.ledger-points-positive {
+    color: #059669;
+}
+
+.ledger-points-negative {
+    color: #dc2626;
+}
+
+/* Responsive history page */
+
+@media (max-width: 991.98px) {
+    .history-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .history-balance-card {
+        max-width: none;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .history-page {
+        gap: 1.25rem;
+    }
+
+    .history-overview {
+        gap: 0.75rem;
+    }
+
+    .history-overview-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .history-overview-note {
+        line-height: 1.6;
+    }
+
+    .history-panel-heading {
+        padding: 1.15rem;
+    }
+
+    .history-ledger {
+        padding: 0 1.1rem;
+    }
+
+    .history-ledger-row {
+        grid-template-columns: 40px minmax(0, 1fr) auto;
+        gap: 0.65rem;
+    }
+
+    .ledger-activity-date {
+        display: none;
+    }
+
+    .ledger-activity-info span {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .history-hero {
+        padding: 1.4rem;
+        border-radius: 20px;
+    }
+
+    .history-hero-copy h1 {
+        font-size: 2.1rem;
+    }
+
+    .history-overview-card {
+        padding: 0.85rem;
+    }
+
+    .history-overview-value {
+        font-size: 1.4rem;
+    }
+
+    .history-overview-label {
+        font-size: 0.7rem;
+    }
+
+    .history-panel-heading p {
+        font-size: 0.73rem;
+    }
+
+    .history-heading-icon {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+    .history-ledger-row {
+        grid-template-columns: 35px minmax(0, 1fr) auto;
+        gap: 0.55rem;
+    }
+
+    .ledger-activity-icon {
+        width: 35px;
+        height: 35px;
+    }
+
+    .ledger-points {
+        font-size: 0.78rem;
+    }
+}
