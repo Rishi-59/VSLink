@@ -5,6 +5,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.db.models import Sum
 
+from unittest.mock import patch
+
 from accounts.models import CustomerProfile
 from loyalty.models import (
     PointsTransaction,
@@ -365,6 +367,114 @@ class LoyaltyCheckoutRuleTests(TestCase):
         self.assertEqual(
             purchase.price_paid,
             Decimal("350.00"),
+        )
+
+    def test_balance_is_rechecked_before_each_redemption(self):
+        self.product.points = 0
+        self.product.save(update_fields=["points"])
+
+        self.add_points(50)
+
+        reward = Reward.objects.create(
+            name="Forty Point Reward",
+            points_required=40,
+            discount_type=Reward.DiscountType.FIXED,
+            discount_value=Decimal("25.00"),
+            is_active=True,
+        )
+
+        first_response = self.client.post(
+            self.checkout_url,
+            {
+                "checkout_token": self.checkout_token(),
+                "reward_id": str(reward.pk),
+            },
+        )
+        self.assertEqual(first_response.status_code, 302)
+
+        balance_after_first = PointsTransaction.objects.filter(
+            customer=self.user
+        ).aggregate(total=Sum("points"))["total"]
+        self.assertEqual(balance_after_first, 10)
+
+        second_response = self.client.post(
+            self.checkout_url,
+            {
+                "checkout_token": self.checkout_token(),
+                "reward_id": str(reward.pk),
+            },
+        )
+        self.assertEqual(second_response.status_code, 302)
+
+        balance_after_second = PointsTransaction.objects.filter(
+            customer=self.user
+        ).aggregate(total=Sum("points"))["total"]
+
+        self.assertEqual(balance_after_second, 10)
+        self.assertEqual(
+            Redemption.objects.filter(customer=self.user).count(),
+            1,
+        )
+        self.assertEqual(
+            Purchase.objects.filter(customer=self.user).count(),
+            1,
+        )
+
+    def test_checkout_failure_rolls_back_purchase_and_redemption(self):
+        self.add_points(100)
+
+        reward = Reward.objects.create(
+            name="Rollback Reward",
+            points_required=40,
+            discount_type=Reward.DiscountType.FIXED,
+            discount_value=Decimal("25.00"),
+            is_active=True,
+        )
+
+        original_create = PointsTransaction.objects.create
+
+        def fail_on_redemption_ledger_entry(**kwargs):
+            if (
+                    kwargs.get("type")
+                    == PointsTransaction.TransactionType.REDEMPTION
+            ):
+                raise RuntimeError("Simulated ledger failure")
+
+            return original_create(**kwargs)
+
+        with patch.object(
+                PointsTransaction.objects,
+                "create",
+                side_effect=fail_on_redemption_ledger_entry,
+        ):
+            with self.assertRaises(RuntimeError):
+                self.client.post(
+                    self.checkout_url,
+                    {
+                        "checkout_token": self.checkout_token(),
+                        "reward_id": str(reward.pk),
+                    },
+                )
+
+        self.assertEqual(
+            Purchase.objects.filter(customer=self.user).count(),
+            0,
+        )
+        self.assertEqual(
+            Redemption.objects.filter(customer=self.user).count(),
+            0,
+        )
+        self.assertEqual(
+            PointsTransaction.objects.filter(
+                customer=self.user
+            ).count(),
+            1,
+        )
+        self.assertEqual(
+            PointsTransaction.objects.filter(
+                customer=self.user
+            ).aggregate(total=Sum("points"))["total"],
+            100,
         )
 
 class StaffCustomerReportTests(TestCase):

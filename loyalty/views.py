@@ -2,6 +2,7 @@
 from functools import wraps
 
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -312,6 +313,13 @@ def complete_purchase(request, pk):
                 )
                 return redirect("loyalty:checkout", pk=pk)
 
+            locked_customer = (
+                get_user_model()
+                .objects
+                .select_for_update()
+                .get(pk=request.user.pk)
+            )
+
             product = (
                 Product.objects
                 .select_for_update()
@@ -335,7 +343,7 @@ def complete_purchase(request, pk):
                     messages.error(request, "That reward is not available.")
                     return redirect("loyalty:checkout", pk=pk)
 
-                balance = get_points_balance(request.user)
+                balance = get_points_balance(locked_customer)
 
                 if balance < reward.points_required:
                     messages.error(
