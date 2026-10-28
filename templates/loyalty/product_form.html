@@ -1,40 +1,85 @@
 
 {% extends "base.html" %}
+
 {% block title %}{{ page_title }} | VSLink{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-7 col-lg-6">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h1 class="h3 mb-4">{{ page_title }}</h1>
-                <form method="post">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            {% if field.field.widget.input_type == "checkbox" %}
-                                <div class="form-check">
-                                    {{ field }}
-                                    <label class="form-check-label" for="{{ field.id_for_label }}">
-                                        {{ field.label }}
-                                    </label>
-                                </div>
-                            {% else %}
-                                <label class="form-label" for="{{ field.id_for_label }}">
-                                    {{ field.label }}
-                                </label>
-                                {{ field }}
-                            {% endif %}
-                            {% for error in field.errors %}
-                                <div class="text-danger small">{{ error }}</div>
-                            {% endfor %}
-                        </div>
-                    {% endfor %}
-                    <button class="btn btn-primary" type="submit">Save product</button>
-                    <a class="btn btn-outline-secondary"
-                       href="{% url 'loyalty:staff_products' %}">Cancel</a>
-                </form>
+<div class="staff-page staff-form-page">
+    <nav class="staff-breadcrumb">
+        <a href="{% url 'loyalty:staff_products' %}">Products</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>{{ page_title }}</span>
+    </nav>
+
+    <section class="staff-page-header">
+        <div>
+            <div class="section-kicker">PRODUCT CATALOGUE</div>
+            <h1>{{ page_title }}</h1>
+            <p>Set the product details, price, and loyalty points customers earn.</p>
+        </div>
+    </section>
+
+    <section class="staff-form-panel">
+        <div class="staff-form-panel-heading">
+            <span class="staff-form-heading-icon">
+                <i class="bi bi-box-seam"></i>
+            </span>
+            <div>
+                <h2>Product details</h2>
+                <p>Fields marked by your form validation are required.</p>
             </div>
         </div>
-    </div>
+
+        <form method="post" class="staff-form-body">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="staff-form-grid">
+                {% for field in form %}
+                    {% if field.field.widget.input_type == "checkbox" %}
+                        <div class="staff-form-toggle staff-field-{{ field.name }}">
+                            <div class="form-check">
+                                {{ field }}
+                                <label class="form-check-label"
+                                       for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                </label>
+                            </div>
+                            {% if field.help_text %}
+                                <div class="staff-field-help">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="staff-field-error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="staff-form-field staff-field-{{ field.name }}">
+                            <label class="form-label" for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="staff-field-help">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="staff-field-error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="staff-form-actions">
+                <a href="{% url 'loyalty:staff_products' %}"
+                   class="btn btn-outline-secondary">Cancel</a>
+                <button class="btn btn-primary px-4" type="submit">
+                    <i class="bi bi-check2 me-2"></i>Save product
+                </button>
+            </div>
+        </form>
+    </section>
 </div>
 {% endblock %}
