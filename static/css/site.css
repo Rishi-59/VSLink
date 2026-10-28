@@ -3419,3 +3419,780 @@ a {
         font-size: 0.78rem;
     }
 }
+
+
+/* =========================================
+   STAFF WORKSPACE
+   ========================================= */
+
+.staff-page {
+    display: grid;
+    gap: 1.5rem;
+    padding: 0.5rem 0 2rem;
+}
+
+.staff-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.staff-page-header h1 {
+    margin-top: 0.45rem;
+    color: var(--vs-navy);
+    font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+}
+
+.staff-page-header p {
+    margin: 0.45rem 0 0;
+    color: var(--vs-muted);
+    font-size: 0.86rem;
+    line-height: 1.8;
+}
+
+.staff-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    overflow-x: auto;
+    padding: 0.4rem;
+    border: 1px solid var(--vs-border);
+    border-radius: 14px;
+    background: #fff;
+    scrollbar-width: thin;
+}
+
+.staff-tab {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background 0.18s ease, color 0.18s ease;
+}
+
+.staff-tab:hover {
+    background: #f8faff;
+    color: var(--vs-blue);
+}
+
+.staff-tab-active {
+    background: #eef2ff;
+    color: var(--vs-blue);
+}
+
+.staff-tab-active:hover {
+    background: #e5eafe;
+    color: var(--vs-blue-dark);
+}
+
+.staff-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.staff-metric {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.3rem;
+    border: 1px solid var(--vs-border);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 6px 22px rgba(23, 37, 84, 0.03);
+}
+
+.staff-metric-icon {
+    display: grid;
+    width: 45px;
+    height: 45px;
+    flex: 0 0 45px;
+    place-items: center;
+    border-radius: 13px;
+    font-size: 1.15rem;
+}
+
+.staff-metric-blue {
+    background: #eef2ff;
+    color: #4f46e5;
+}
+
+.staff-metric-green {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.staff-metric-purple {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.staff-metric > div {
+    display: grid;
+    gap: 0.2rem;
+}
+
+.staff-metric-label {
+    color: var(--vs-muted);
+    font-size: 0.75rem;
+}
+
+.staff-metric strong {
+    color: var(--vs-navy);
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+}
+
+.staff-table-panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--vs-border);
+    border-radius: 19px;
+    background: #fff;
+    box-shadow: 0 8px 26px rgba(23, 37, 84, 0.04);
+}
+
+.staff-table-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.35rem 1.5rem;
+    border-bottom: 1px solid #eef1f7;
+}
+
+.staff-table-heading h2 {
+    margin: 0;
+    color: var(--vs-navy);
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.staff-table-heading p {
+    margin: 0.35rem 0 0;
+    color: var(--vs-muted);
+    font-size: 0.77rem;
+    line-height: 1.7;
+}
+
+.staff-count-badge {
+    flex-shrink: 0;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--vs-border);
+    border-radius: 9px;
+    background: #f8faff;
+    color: #475569;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.staff-table {
+    min-width: 750px;
+}
+
+.staff-table thead th {
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid var(--vs-border);
+    background: #fafbff;
+    color: #64748b;
+    font-size: 0.68rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.staff-table tbody td {
+    padding: 1rem 1.1rem;
+    border-bottom: 1px solid #eef1f7;
+    font-size: 0.79rem;
+}
+
+.staff-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.staff-table tbody tr:hover {
+    background: #fcfcff;
+}
+
+.staff-record {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 190px;
+}
+
+.staff-record-icon {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    place-items: center;
+    border-radius: 12px;
+    background: #eef2ff;
+    color: var(--vs-blue);
+    font-size: 1.05rem;
+}
+
+.staff-record-purple {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.staff-record > div {
+    display: grid;
+    gap: 0.22rem;
+    min-width: 0;
+}
+
+.staff-record strong {
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 800;
+}
+
+.staff-record small {
+    display: -webkit-box;
+    max-width: 260px;
+    overflow: hidden;
+    color: #94a3b8;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.staff-price {
+    color: var(--vs-navy);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.staff-points-pill {
+    display: inline-block;
+    padding: 0.4rem 0.5rem;
+    border-radius: 8px;
+    background: #ecfdf5;
+    color: #047857;
+    font-size: 0.72rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.staff-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.4rem 0.55rem;
+    border-radius: 8px;
+    font-size: 0.71rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.staff-status > span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.staff-status-active {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.staff-status-active > span {
+    background: #10b981;
+}
+
+.staff-status-inactive {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.staff-status-inactive > span {
+    background: #94a3b8;
+}
+
+.staff-discount-value {
+    color: var(--vs-navy);
+    font-size: 0.8rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.staff-discount-value small {
+    display: block;
+    margin-top: 0.25rem;
+    color: #94a3b8;
+    font-size: 0.68rem;
+    font-weight: 500;
+}
+
+.staff-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: max-content;
+}
+
+.staff-actions .btn {
+    font-size: 0.72rem;
+}
+
+.staff-actions form {
+    margin: 0;
+}
+
+.staff-table-footer {
+    padding: 0.95rem 1.4rem;
+    border-top: 1px solid #eef1f7;
+    background: #fafbff;
+    color: #64748b;
+    font-size: 0.72rem;
+    line-height: 1.7;
+}
+
+.staff-table-footer i {
+    color: var(--vs-blue);
+}
+
+.staff-empty-state {
+    padding: 3.2rem 1.2rem;
+    text-align: center;
+}
+
+.staff-empty-state > span {
+    display: grid;
+    width: 55px;
+    height: 55px;
+    margin: 0 auto;
+    place-items: center;
+    border-radius: 17px;
+    background: #eef2ff;
+    color: var(--vs-blue);
+    font-size: 1.5rem;
+}
+
+.staff-empty-state h3 {
+    margin-top: 1rem;
+    color: var(--vs-navy);
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+.staff-empty-state p {
+    max-width: 430px;
+    margin: 0.4rem auto 1.15rem;
+    color: var(--vs-muted);
+    font-size: 0.8rem;
+    line-height: 1.8;
+}
+
+/* Staff form pages */
+
+.staff-form-page {
+    max-width: 1000px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.staff-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: #94a3b8;
+    font-size: 0.78rem;
+}
+
+.staff-breadcrumb a {
+    color: #64748b;
+    font-weight: 600;
+}
+
+.staff-breadcrumb a:hover {
+    color: var(--vs-blue);
+}
+
+.staff-breadcrumb > span {
+    color: var(--vs-navy);
+    font-weight: 700;
+}
+
+.staff-breadcrumb > i {
+    font-size: 0.65rem;
+}
+
+.staff-form-panel {
+    overflow: hidden;
+    border: 1px solid var(--vs-border);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 9px 30px rgba(23, 37, 84, 0.045);
+}
+
+.staff-form-panel-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1.45rem 1.6rem;
+    border-bottom: 1px solid #eef1f7;
+}
+
+.staff-form-heading-icon {
+    display: grid;
+    width: 45px;
+    height: 45px;
+    flex: 0 0 45px;
+    place-items: center;
+    border-radius: 13px;
+    background: #eef2ff;
+    color: var(--vs-blue);
+    font-size: 1.2rem;
+}
+
+.staff-form-heading-purple {
+    background: #f3e8ff;
+    color: #9333ea;
+}
+
+.staff-form-panel-heading h2 {
+    margin: 0;
+    color: var(--vs-navy);
+    font-size: 1.03rem;
+    font-weight: 800;
+}
+
+.staff-form-panel-heading p {
+    margin: 0.3rem 0 0;
+    color: var(--vs-muted);
+    font-size: 0.76rem;
+    line-height: 1.7;
+}
+
+.staff-form-body {
+    padding: clamp(1.3rem, 3vw, 2rem);
+}
+
+.staff-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.35rem 1.2rem;
+}
+
+.staff-form-field {
+    min-width: 0;
+}
+
+.staff-form-field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.staff-form-field .form-control,
+.staff-form-field .form-select {
+    min-height: 47px;
+    border-color: #dbe2ef;
+    border-radius: 10px;
+    font-size: 0.85rem;
+}
+
+.staff-form-field textarea.form-control {
+    min-height: 105px;
+}
+
+.staff-form-field .form-control:focus,
+.staff-form-field .form-select:focus {
+    border-color: #818cf8;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.11);
+}
+
+.staff-field-description,
+.staff-field-is_active {
+    grid-column: 1 / -1;
+}
+
+.staff-field-help {
+    margin-top: 0.45rem;
+    color: #94a3b8;
+    font-size: 0.72rem;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.staff-field-error {
+    margin-top: 0.4rem;
+    color: #dc2626;
+    font-size: 0.75rem;
+    line-height: 1.6;
+}
+
+.staff-form-toggle {
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--vs-border);
+    border-radius: 13px;
+    background: #fafbff;
+}
+
+.staff-form-toggle .form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 24px;
+    padding-left: 0;
+}
+
+.staff-form-toggle .form-check-input {
+    float: none;
+    flex: 0 0 1rem;
+    margin: 0;
+    margin-left: 0;
+    cursor: pointer;
+}
+
+.staff-form-toggle .form-check-label {
+    margin: 0;
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.staff-form-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-top: 1.4rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid #dbeafe;
+    border-radius: 13px;
+    background: #eff6ff;
+}
+
+.staff-form-info > i {
+    margin-top: 0.1rem;
+    color: #2563eb;
+    font-size: 1rem;
+}
+
+.staff-form-info p {
+    margin: 0;
+    color: #475569;
+    font-size: 0.76rem;
+    line-height: 1.8;
+}
+
+.staff-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.7rem;
+    margin-top: 1.7rem;
+    padding-top: 1.3rem;
+    border-top: 1px solid #eef1f7;
+}
+
+.staff-form-actions .btn {
+    min-height: 43px;
+}
+
+/* Referral percentage configuration */
+
+.referral-config-hero {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.4rem;
+    border: 1px solid #e2e7f8;
+    border-radius: 18px;
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(196, 181, 253, 0.35), transparent 40%),
+        linear-gradient(125deg, #fff, #f6f7ff);
+}
+
+.referral-config-hero-icon {
+    display: grid;
+    width: 47px;
+    height: 47px;
+    flex: 0 0 47px;
+    place-items: center;
+    border-radius: 14px;
+    background: #eef2ff;
+    color: var(--vs-blue);
+    font-size: 1.25rem;
+}
+
+.referral-config-hero h2 {
+    margin: 0;
+    color: var(--vs-navy);
+    font-size: 1.08rem;
+    font-weight: 800;
+}
+
+.referral-config-hero p {
+    max-width: 690px;
+    margin: 0.4rem 0 0;
+    color: var(--vs-muted);
+    font-size: 0.8rem;
+    line-height: 1.8;
+}
+
+.referral-level-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.1rem;
+}
+
+.referral-level-card {
+    min-width: 0;
+    padding: 1.3rem;
+    border: 1px solid var(--vs-border);
+    border-radius: 16px;
+    background: #fff;
+}
+
+.referral-level-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+}
+
+.referral-level-icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 12px;
+    background: #eef2ff;
+    color: var(--vs-blue);
+    font-size: 1.05rem;
+}
+
+.referral-level-number {
+    color: #94a3b8;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+}
+
+.referral-level-card .form-label {
+    color: #334155;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.referral-percent-input {
+    position: relative;
+}
+
+.referral-percent-input .form-control {
+    min-height: 58px;
+    padding-right: 3rem;
+    border-color: #dbe2ef;
+    border-radius: 12px;
+    color: var(--vs-navy);
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.referral-percent-input > span {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    color: var(--vs-muted);
+    font-size: 1rem;
+    font-weight: 700;
+    transform: translateY(-50%);
+}
+
+@media (max-width: 767.98px) {
+    .staff-page-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .staff-page-header > .btn {
+        width: 100%;
+    }
+
+    .staff-metrics {
+        gap: 0.7rem;
+    }
+
+    .staff-metric {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .staff-table-heading {
+        padding: 1.1rem;
+    }
+
+    .staff-tabs {
+        max-width: 100%;
+    }
+
+    .staff-form-panel-heading {
+        padding: 1.2rem;
+    }
+
+    .referral-level-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .staff-page {
+        gap: 1.1rem;
+    }
+
+    .staff-metric-label {
+        font-size: 0.7rem;
+    }
+
+    .staff-metric strong {
+        font-size: 1.1rem;
+    }
+
+    .staff-form-body {
+        padding: 1.15rem;
+    }
+
+    .staff-form-grid {
+        grid-template-columns: 1fr;
+        gap: 1.1rem;
+    }
+
+    .staff-form-field,
+    .staff-form-toggle {
+        grid-column: 1 / -1;
+    }
+
+    .staff-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .staff-form-actions .btn {
+        width: 100%;
+    }
+
+    .referral-config-hero {
+        padding: 1.1rem;
+    }
+}
