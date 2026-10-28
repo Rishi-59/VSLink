@@ -1,39 +1,208 @@
- {% extends "base.html" %}
-{% block title %}Products | VSLink{% endblock %}
+
+{% extends "base.html" %}
+
+{% block title %}Explore Products | VSLink{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h2 mb-1">Products</h1>
-        <p class="text-muted mb-0">Earn loyalty points with every purchase.</p>
-    </div>
-    <div class="text-end">
-        <div class="fw-semibold">{{ balance }} points</div>
-        <a href="{% url 'loyalty:purchase_history' %}">Purchase history</a>
-    </div>
-</div>
+<div class="catalogue-page">
 
-<div class="row g-3">
-    {% for product in products %}
-        <div class="col-md-6 col-lg-4">
-            <div class="card h-100 shadow-sm">
-                <div class="card-body">
-                    <h2 class="h5">{{ product.name }}</h2>
-                    <p class="text-muted">{{ product.description }}</p>
-                    <p class="fs-4 fw-semibold mb-1">₹{{ product.price }}</p>
-                    <p class="text-success">{{ product.points }} points earned</p>
+    <section class="catalogue-hero">
+        <div class="catalogue-hero-copy">
+            <div class="section-kicker">
+                YOUR NEXT PURCHASE, MORE REWARDING
+            </div>
+            <h1>Discover something <span>worth earning for.</span></h1>
+            <p>
+                Explore our available products, earn loyalty points, and
+                make your points go further with eligible rewards.
+            </p>
+            <a href="#product-list" class="btn btn-primary px-4">
+                Explore products
+                <i class="bi bi-arrow-down ms-2"></i>
+            </a>
+        </div>
 
-                    <a class="btn btn-primary"
-                       href="{% url 'loyalty:checkout' product.pk %}">
-                        Buy now
-                    </a>
+        <div class="catalogue-hero-visual" aria-hidden="true">
+            <div class="catalogue-visual-orb"></div>
+            <div class="catalogue-visual-card catalogue-visual-back">
+                <i class="bi bi-stars"></i>
+                <span>Every purchase counts</span>
+            </div>
+            <div class="catalogue-visual-card catalogue-visual-front">
+                <span class="catalogue-visual-icon">
+                    <i class="bi bi-gift"></i>
+                </span>
+                <div class="catalogue-visual-label">YOUR LOYALTY JOURNEY</div>
+                <div class="catalogue-visual-title">Shop. Earn. Redeem.</div>
+                <div class="catalogue-visual-subtitle">
+                    Make the most of your points.
                 </div>
             </div>
         </div>
-    {% empty %}
-        <div class="col-12">
-            <div class="alert alert-info">No products are available yet.</div>
+    </section>
+
+    <section class="catalogue-loyalty-strip">
+        <div class="catalogue-loyalty-icon">
+            <i class="bi bi-stars"></i>
         </div>
-    {% endfor %}
+        <div class="catalogue-loyalty-copy">
+            <strong>Your loyalty balance</strong>
+            <span>Use eligible points to redeem rewards at checkout.</span>
+        </div>
+        <div class="catalogue-loyalty-balance">
+            <span class="catalogue-balance-value">{{ balance }}</span>
+            <span class="catalogue-balance-label">points available</span>
+        </div>
+        <a href="{% url 'loyalty:purchase_history' %}"
+           class="catalogue-history-link">
+            View activity <i class="bi bi-arrow-up-right ms-1"></i>
+        </a>
+    </section>
+
+    <section class="catalogue-products-section" id="product-list">
+        <div class="catalogue-section-heading">
+            <div>
+                <div class="section-kicker">THE COLLECTION</div>
+                <h2>Explore products</h2>
+                <p>Find your next purchase and earn points along the way.</p>
+            </div>
+            <span class="catalogue-count">
+                <i class="bi bi-grid me-2"></i>
+                <span id="product-count">{{ products|length }}</span> products
+            </span>
+        </div>
+
+        <div class="catalogue-toolbar">
+            <div class="catalogue-search">
+                <i class="bi bi-search"></i>
+                <input id="product-search"
+                       type="search"
+                       class="form-control"
+                       placeholder="Search products..."
+                       aria-label="Search products"
+                       autocomplete="off">
+            </div>
+            <div class="catalogue-toolbar-note">
+                <i class="bi bi-check-circle"></i>
+                All listed products are available to purchase
+            </div>
+        </div>
+
+        <div class="row g-4" id="catalogue-grid">
+            {% for product in products %}
+                <div class="col-md-6 col-xl-4 catalogue-product-col"
+                     data-product-search="{{ product.name|lower }} {{ product.description|lower }}">
+                    <article class="catalogue-product-card h-100">
+                        <div class="catalogue-product-art">
+                            <span class="catalogue-product-art-badge">
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                Available
+                            </span>
+                            <div class="catalogue-product-art-icon">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <div class="catalogue-art-decoration catalogue-art-decoration-one"></div>
+                            <div class="catalogue-art-decoration catalogue-art-decoration-two"></div>
+                            <div class="catalogue-product-art-caption">
+                                VSLink collection
+                            </div>
+                        </div>
+
+                        <div class="catalogue-product-body">
+                            <div class="catalogue-product-title-row">
+                                <h3>{{ product.name }}</h3>
+                                <span class="catalogue-product-points">
+                                    <i class="bi bi-stars me-1"></i>
+                                    +{{ product.points }}
+                                </span>
+                            </div>
+
+                            <p class="catalogue-product-description">
+                                {{ product.description|default:"Explore this product and earn loyalty points with your purchase." }}
+                            </p>
+
+                            <div class="catalogue-product-footer">
+                                <div>
+                                    <span class="catalogue-price-label">PRICE</span>
+                                    <div class="catalogue-product-price">
+                                        ₹{{ product.price|floatformat:2 }}
+                                    </div>
+                                </div>
+
+                                <a href="{% url 'loyalty:checkout' product.pk %}"
+                                   class="btn btn-primary catalogue-buy-button">
+                                    Buy now
+                                    <i class="bi bi-arrow-up-right ms-1"></i>
+                                </a>
+                            </div>
+
+                            <div class="catalogue-product-footnote">
+                                <i class="bi bi-stars me-1"></i>
+                                Earn {{ product.points }} points with this purchase
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="catalogue-empty-state">
+                        <span class="catalogue-empty-icon">
+                            <i class="bi bi-bag"></i>
+                        </span>
+                        <h3>Products are on their way</h3>
+                        <p>There are no active products to display right now.</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div id="catalogue-no-results"
+             class="catalogue-empty-state d-none">
+            <span class="catalogue-empty-icon">
+                <i class="bi bi-search"></i>
+            </span>
+            <h3>No matching products</h3>
+            <p>Try a different name or search term.</p>
+        </div>
+    </section>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (() => {
+        const search = document.getElementById("product-search");
+        const grid = document.getElementById("catalogue-grid");
+        const count = document.getElementById("product-count");
+        const noResults = document.getElementById("catalogue-no-results");
+
+        if (!search || !grid || !count || !noResults) return;
+
+        const cards = Array.from(
+            grid.querySelectorAll(".catalogue-product-col")
+        );
+
+        function filterProducts() {
+            const query = search.value.trim().toLowerCase();
+            let visible = 0;
+
+            cards.forEach((card) => {
+                const text = card.dataset.productSearch || "";
+                const matches = text.includes(query);
+
+                card.classList.toggle("d-none", !matches);
+                if (matches) visible += 1;
+            });
+
+            count.textContent = visible;
+            noResults.classList.toggle(
+                "d-none",
+                visible > 0 || cards.length === 0
+            );
+        }
+
+        search.addEventListener("input", filterProducts);
+    })();
+</script>
 {% endblock %}

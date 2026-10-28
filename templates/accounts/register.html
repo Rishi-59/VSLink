@@ -1,40 +1,132 @@
 
 {% extends "base.html" %}
-{% block title %}Register | VSLink{% endblock %}
+
+{% block title %}Create Account | VSLink{% endblock %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-7 col-lg-6">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h1 class="h3 mb-3">Create your account</h1>
-                <form method="post">
-                    {% csrf_token %}
+<section class="auth-shell auth-shell-register">
+    <aside class="auth-showcase">
+        <div class="auth-decoration auth-decoration-one"></div>
+        <div class="auth-decoration auth-decoration-two"></div>
+        <div class="auth-decoration auth-decoration-three"></div>
+
+        <a class="auth-brand" href="{% url 'home' %}">
+            <span class="brand-mark">V</span>
+            <span>VSLink<span class="brand-period">.</span></span>
+        </a>
+
+        <div class="auth-showcase-content">
+            <span class="auth-eyebrow">
+                <i class="bi bi-rocket-takeoff me-2"></i>GET STARTED
+            </span>
+
+            <h1>Make every connection count.</h1>
+
+            <p class="auth-showcase-description">
+                Create your account and discover a simpler way to earn points,
+                redeem rewards and build your referral network.
+            </p>
+
+            <div class="auth-benefits">
+                <div>
+                    <span class="auth-benefit-icon">
+                        <i class="bi bi-person-check"></i>
+                    </span>
+                    <span>
+                        <strong>Your own account</strong>
+                        <small>Keep your loyalty activity together</small>
+                    </span>
+                </div>
+
+                <div>
+                    <span class="auth-benefit-icon">
+                        <i class="bi bi-stars"></i>
+                    </span>
+                    <span>
+                        <strong>Points and rewards</strong>
+                        <small>Get more from eligible purchases</small>
+                    </span>
+                </div>
+
+                <div>
+                    <span class="auth-benefit-icon">
+                        <i class="bi bi-people"></i>
+                    </span>
+                    <span>
+                        <strong>Referral connections</strong>
+                        <small>Invite others with your unique code</small>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-showcase-footer">
+            <i class="bi bi-shield-check me-2"></i>
+            Your loyalty journey starts here
+        </div>
+    </aside>
+
+    <div class="auth-panel">
+        <div class="auth-panel-inner">
+            <div class="auth-mobile-brand">
+                <span class="brand-mark">V</span>
+                <span class="brand-name">VSLink<span class="brand-period">.</span></span>
+            </div>
+
+            <div class="auth-form-heading">
+                <span class="section-kicker">JOIN THE COMMUNITY</span>
+                <h2>Create your account</h2>
+                <p>Fill in your details to get started with VSLink.</p>
+            </div>
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form method="post" class="auth-form">
+                {% csrf_token %}
+
+                <div class="auth-register-grid">
                     {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label" for="{{ field.id_for_label }}">
+                        <div class="auth-field auth-field-{{ field.name }}">
+                            <label for="{{ field.id_for_label }}">
                                 {{ field.label }}
                             </label>
+
                             {{ field }}
+
                             {% if field.help_text %}
-                                <div class="form-text">{{ field.help_text }}</div>
+                                <div class="auth-help">
+                                    {{ field.help_text|safe }}
+                                </div>
                             {% endif %}
+
                             {% for error in field.errors %}
-                                <div class="text-danger small">{{ error }}</div>
+                                <div class="auth-error">{{ error }}</div>
                             {% endfor %}
                         </div>
                     {% endfor %}
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-                    {% endif %}
-                    <button class="btn btn-primary w-100" type="submit">
-                        Create account
-                    </button>
-                </form>
-                <p class="mt-3 mb-0">Already registered?
-                    <a href="{% url 'accounts:login' %}">Log in</a>
-                </p>
+                </div>
+
+                <button type="submit"
+                        class="btn btn-primary btn-lg w-100 auth-submit mt-3">
+                    Create account
+                    <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </form>
+
+            <div class="auth-switch">
+                Already have an account?
+                <a href="{% url 'accounts:login' %}">Sign in</a>
             </div>
+
+            <p class="auth-legal">
+                Your referral code is optional. Leave it blank if you weren't
+                invited by another customer.
+            </p>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

@@ -1,53 +1,116 @@
 
 {% extends "base.html" %}
 
+{% block title %}Referral Configuration | VSLink{% endblock %}
+
 {% block content %}
-<div class="container py-4" style="max-width: 760px;">
-    <h2>Referral Bonus Configuration</h2>
-    <p class="text-muted">
-        Configure the percentage of points awarded to each referral level.
-        Changes apply to future purchases only.
-    </p>
+<div class="staff-page staff-form-page">
+    <section class="staff-page-header">
+        <div>
+            <div class="section-kicker">STAFF WORKSPACE</div>
+            <h1>Referral configuration</h1>
+            <p>Control how loyalty points are awarded to customers in your referral network.</p>
+        </div>
+    </section>
 
-    <div class="alert alert-info">
-        Each level can independently be configured from 0% to 100%.
-        The two percentages do not need to add up to 100%.
-    </div>
+    <nav class="staff-tabs" aria-label="Staff navigation">
+        <a class="staff-tab" href="{% url 'loyalty:staff_products' %}">
+            <i class="bi bi-box-seam me-2"></i>Products
+        </a>
+        <a class="staff-tab" href="{% url 'loyalty:staff_rewards' %}">
+            <i class="bi bi-gift me-2"></i>Rewards
+        </a>
+        <a class="staff-tab staff-tab-active"
+           href="{% url 'loyalty:referral_config' %}">
+            <i class="bi bi-diagram-3 me-2"></i>Referral settings
+        </a>
+    </nav>
 
-    <form method="post">
-        {% csrf_token %}
+    <section class="referral-config-hero">
+        <span class="referral-config-hero-icon">
+            <i class="bi bi-diagram-3"></i>
+        </span>
+        <div>
+            <h2>Configure referral bonuses</h2>
+            <p>
+                Set the percentage of a purchaser's earned points that goes to
+                their direct referrer and second-level referrer.
+            </p>
+        </div>
+    </section>
 
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger">
-                {{ form.non_field_errors }}
+    <section class="staff-form-panel">
+        <div class="staff-form-panel-heading">
+            <span class="staff-form-heading-icon">
+                <i class="bi bi-sliders"></i>
+            </span>
+            <div>
+                <h2>Bonus percentages</h2>
+                <p>Updates apply to future purchases; existing ledger entries remain unchanged.</p>
             </div>
-        {% endif %}
+        </div>
 
-        {% for field in form %}
-            <div class="mb-4">
-                <label class="form-label" for="{{ field.id_for_label }}">
-                    {{ field.label }}
-                </label>
+        <form method="post" class="staff-form-body">
+            {% csrf_token %}
 
-                {{ field }}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
 
-                {% if field.help_text %}
-                    <div class="form-text">{{ field.help_text }}</div>
-                {% endif %}
+            <div class="referral-level-grid">
+                {% for field in form %}
+                    <article class="referral-level-card">
+                        <div class="referral-level-top">
+                            <span class="referral-level-icon">
+                                {% if field.name == "level1_percent" %}
+                                    <i class="bi bi-person-check"></i>
+                                {% else %}
+                                    <i class="bi bi-people"></i>
+                                {% endif %}
+                            </span>
+                            <span class="referral-level-number">
+                                {% if field.name == "level1_percent" %}LEVEL 01{% else %}LEVEL 02{% endif %}
+                            </span>
+                        </div>
 
-                {% for error in field.errors %}
-                    <div class="text-danger small">{{ error }}</div>
+                        <label class="form-label"
+                               for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+
+                        <div class="referral-percent-input">
+                            {{ field }}
+                            <span>%</span>
+                        </div>
+
+                        {% if field.help_text %}
+                            <div class="staff-field-help">{{ field.help_text }}</div>
+                        {% endif %}
+
+                        {% for error in field.errors %}
+                            <div class="staff-field-error">{{ error }}</div>
+                        {% endfor %}
+                    </article>
                 {% endfor %}
             </div>
-        {% endfor %}
 
-        <button type="submit" class="btn btn-primary">
-            Save Configuration
-        </button>
-        <a href="{% url 'loyalty:staff_rewards' %}"
-           class="btn btn-outline-secondary">
-            Back to Rewards
-        </a>
-    </form>
+            <div class="staff-form-info">
+                <i class="bi bi-info-circle"></i>
+                <p>
+                    Each percentage can independently range from 0% to 100%.
+                    They do not need to add up to 100%. The application calculates
+                    bonuses from the purchaser's earned points.
+                </p>
+            </div>
+
+            <div class="staff-form-actions">
+                <a href="{% url 'loyalty:staff_rewards' %}"
+                   class="btn btn-outline-secondary">Back to rewards</a>
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-check2 me-2"></i>Save configuration
+                </button>
+            </div>
+        </form>
+    </section>
 </div>
 {% endblock %}

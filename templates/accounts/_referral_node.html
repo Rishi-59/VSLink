@@ -1,25 +1,46 @@
-<li>
-    <div class="referral-node {% if node.profile.pk == root_profile.pk %}referral-node-you{% endif %}">
-        <strong>
-            {{ node.profile.user.get_full_name|default:node.profile.user.username }}
-        </strong>
 
-        {% if node.profile.pk == root_profile.pk %}
-        <span class="badge text-bg-primary ms-1">Selected customer</span>
-        {% endif %}
+<li class="referral-tree-node">
+    <article class="referral-node-card
+        {% if node.profile.pk == root_profile.pk %}referral-node-selected{% endif %}
+        {% if node.profile.pk == own_profile_id %}referral-node-own{% endif %}">
 
-        <div class="small text-muted">
-            Referral code: {{ node.profile.referral_code }}
+        <span class="referral-node-avatar
+            {% if node.profile.pk == root_profile.pk %}referral-avatar-selected{% endif %}">
+            <i class="bi bi-person-fill"></i>
+        </span>
+
+        <div class="referral-node-main">
+            <div class="referral-node-title-row">
+                <strong class="referral-node-name">
+                    {{ node.profile.user.get_full_name|default:node.profile.user.username }}
+                </strong>
+
+                {% if node.profile.pk == own_profile_id %}
+                    <span class="referral-node-badge referral-badge-own">You</span>
+                {% elif node.profile.pk == root_profile.pk %}
+                    <span class="referral-node-badge referral-badge-selected">
+                        Selected customer
+                    </span>
+                {% endif %}
+            </div>
+
+            <div class="referral-node-code">
+                <i class="bi bi-hash"></i>
+                {{ node.profile.referral_code }}
+            </div>
         </div>
-    </div>
+
+        <div class="referral-node-count">
+            <strong>{{ node.children|length }}</strong>
+            <span>direct referral{{ node.children|length|pluralize }}</span>
+        </div>
+    </article>
 
     {% if node.children %}
-    <ul>
-        {% for child in node.children %}
-        {% include "accounts/_referral_node.html" with node=child %}
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p class="text-muted ms-3">No direct referrals</p>
+        <ul class="referral-tree-children">
+            {% for child in node.children %}
+                {% include "accounts/_referral_node.html" with node=child root_profile=root_profile own_profile_id=own_profile_id %}
+            {% endfor %}
+        </ul>
     {% endif %}
 </li>

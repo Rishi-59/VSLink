@@ -1,57 +1,173 @@
-<!doctype html>
+{% load static %}
+
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}VSLink{% endblock %}</title>
+
+    <title>{% block title %}VSLink | Loyalty & Referrals{% endblock %}</title>
+    <meta name="description"
+          content="VSLink helps customers earn loyalty points, redeem rewards, and grow referral networks.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet">
+    <link href="{% static 'css/site.css' %}?v=2" rel="stylesheet">
+
+    {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" href="{% url 'accounts:profile' %}">VSLink</a>
-        <div class="navbar-nav ms-auto">
-            {% if user.is_authenticated %}
-            <a class="nav-link" href="{% url 'accounts:profile' %}">Profile</a>
-            <a class="nav-link" href="{% url 'loyalty:catalogue' %}">Products</a>
-            <a class="nav-link" href="{% url 'loyalty:purchase_history' %}">
-                Purchase history
-            </a>
-            <a class="nav-link" href="{% url 'accounts:referral_tree' %}">
-                Referral Tree
-            </a>
-            <form method="post" action="{% url 'accounts:logout' %}">
-                {% csrf_token %}
-                <button class="btn btn-link nav-link" type="submit">Logout</button>
-            </form>
-            {% else %}
-            <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
-            <a class="nav-link" href="{% url 'accounts:register' %}">Register</a>
-            {% endif %}
-            {% if user.is_staff %}
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'loyalty:staff_products' %}">
-                    Manage Products
+
+<body>
+<nav class="navbar navbar-expand-lg site-navbar sticky-top">
+    <div class="container-xl">
+        <a class="navbar-brand d-flex align-items-center gap-2"
+           href="{% url 'home' %}">
+            <span class="brand-mark">V</span>
+            <span class="brand-name">VSLink<span class="brand-period">.</span></span>
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#siteNavigation"
+                aria-controls="siteNavigation" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="siteNavigation">
+            <ul class="navbar-nav mx-auto align-items-lg-center">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}#features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}#how-it-works">
+                        How it works
+                    </a>
+                </li>
+
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'loyalty:catalogue' %}">
+                        Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'loyalty:purchase_history' %}">
+                        Purchase history
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:referral_tree' %}">
+                        Referral network
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if user.is_staff %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#"
+                       role="button" data-bs-toggle="dropdown"
+                       aria-expanded="false">
+                        Staff workspace
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                        <li>
+                            <a class="dropdown-item"
+                               href="{% url 'loyalty:staff_products' %}">
+                                Manage products
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item"
+                               href="{% url 'loyalty:staff_rewards' %}">
+                                Manage rewards
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item"
+                               href="{% url 'loyalty:referral_config' %}">
+                                Referral configuration
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+
+            <div class="d-flex flex-column flex-lg-row gap-2 align-items-lg-center py-3 py-lg-0">
+                {% if user.is_authenticated %}
+                <a class="nav-link account-link"
+                   href="{% url 'accounts:profile' %}">
+                    <i class="bi bi-person-circle me-1"></i>
+                    My account
                 </a>
-                <a class="nav-link" href="{% url 'loyalty:staff_rewards' %}">Manage Rewards</a>
-                <a class="nav-link" href="{% url 'loyalty:referral_config' %}">
-                    Referral Configuration
-                </a>
-            </li>
-            {% endif %}
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-primary btn-sm px-3"
+                            type="submit">Sign out
+                    </button>
+                </form>
+                {% else %}
+                <a class="btn btn-link sign-in-link"
+                   href="{% url 'accounts:login' %}">Sign in</a>
+                <a class="btn btn-primary px-4"
+                   href="{% url 'accounts:register' %}">Get started</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </nav>
 
-<main class="container py-4">
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags|default:'info' }}">
-        {{ message }}
-    </div>
-    {% endfor %}
+<main class="site-main">
+    <div class="container-xl py-4 py-lg-5">
+        {% for message in messages %}
+        <div class="alert
+                {% if message.tags == 'error' %}alert-danger
+                {% elif message.tags == 'success' %}alert-success
+                {% elif message.tags == 'warning' %}alert-warning
+                {% else %}alert-info{% endif %}
+                alert-dismissible fade show" role="status">
+            {{ message }}
+            <button type="button" class="btn-close"
+                    data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
 
-    {% block content %}{% endblock %}
+        {% block content %}{% endblock %}
+    </div>
 </main>
+
+<footer class="site-footer">
+    <div class="container-xl py-4">
+        <div class="row align-items-center gy-3">
+            <div class="col-md-6">
+                <a class="footer-brand" href="{% url 'home' %}">VSLink<span>.</span></a>
+                <p class="footer-copy mb-0 mt-1">
+                    Building stronger customer relationships through loyalty and referrals.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a class="footer-link me-3" href="{% url 'home' %}#features">
+                    Features
+                </a>
+                <a class="footer-link me-3"
+                   href="{% url 'accounts:login' %}">Sign in</a>
+                <a class="footer-link"
+                   href="{% url 'accounts:register' %}">Create account</a>
+                <div class="footer-copy mt-2">
+                    &copy; {% now "Y" %} VSLink. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

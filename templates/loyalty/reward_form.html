@@ -1,52 +1,93 @@
 
 {% extends "base.html" %}
 
+{% block title %}{{ page_title }} | VSLink{% endblock %}
+
 {% block content %}
-<div class="container py-4" style="max-width: 760px;">
-    <h2 class="mb-4">{{ page_title }}</h2>
+<div class="staff-page staff-form-page">
+    <nav class="staff-breadcrumb">
+        <a href="{% url 'loyalty:staff_rewards' %}">Rewards</a>
+        <i class="bi bi-chevron-right"></i>
+        <span>{{ page_title }}</span>
+    </nav>
 
-    <form method="post">
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-            <div class="alert alert-danger">
-                {{ form.non_field_errors }}
-            </div>
-        {% endif %}
-
-        {% for field in form %}
-            {% if field.name == "is_active" %}
-                <div class="form-check mb-3">
-                    {{ field }}
-                    <label class="form-check-label" for="{{ field.id_for_label }}">
-                        {{ field.label }}
-                    </label>
-                    {% for error in field.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="mb-3">
-                    <label class="form-label" for="{{ field.id_for_label }}">
-                        {{ field.label }}
-                    </label>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <div class="form-text">{{ field.help_text }}</div>
-                    {% endif %}
-                    {% for error in field.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endfor %}
-
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary">Save Reward</button>
-            <a href="{% url 'loyalty:staff_rewards' %}" class="btn btn-outline-secondary">
-                Cancel
-            </a>
+    <section class="staff-page-header">
+        <div>
+            <div class="section-kicker">REWARD MANAGEMENT</div>
+            <h1>{{ page_title }}</h1>
+            <p>Configure a reward and the points customers need to redeem it.</p>
         </div>
-    </form>
+    </section>
+
+    <section class="staff-form-panel">
+        <div class="staff-form-panel-heading">
+            <span class="staff-form-heading-icon staff-form-heading-purple">
+                <i class="bi bi-gift"></i>
+            </span>
+            <div>
+                <h2>Reward details</h2>
+                <p>Choose the discount rules and redemption requirements.</p>
+            </div>
+        </div>
+
+        <form method="post" class="staff-form-body">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="staff-form-grid">
+                {% for field in form %}
+                    {% if field.name == "is_active" %}
+                        <div class="staff-form-toggle staff-field-{{ field.name }}">
+                            <div class="form-check">
+                                {{ field }}
+                                <label class="form-check-label"
+                                       for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                </label>
+                            </div>
+                            {% if field.help_text %}
+                                <div class="staff-field-help">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="staff-field-error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="staff-form-field staff-field-{{ field.name }}">
+                            <label class="form-label" for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}
+                                <div class="staff-field-help">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <div class="staff-field-error">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="staff-form-info">
+                <i class="bi bi-info-circle"></i>
+                <p>
+                    Percentage discounts require a maximum discount amount.
+                    The server validates the reward configuration when saving.
+                </p>
+            </div>
+
+            <div class="staff-form-actions">
+                <a href="{% url 'loyalty:staff_rewards' %}"
+                   class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-check2 me-2"></i>Save reward
+                </button>
+            </div>
+        </form>
+    </section>
 </div>
 {% endblock %}

@@ -6,9 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.http import require_POST
 
+from django.db.models import Sum
+
 from .forms import RegistrationForm, StyledAuthenticationForm
 from .models import CustomerProfile
-
+from loyalty.models import PointsTransaction, Purchase, Reward
 
 def register_view(request):
     if request.user.is_authenticated:
@@ -51,12 +53,51 @@ def login_view(request):
 
 @login_required
 def profile_view(request):
-    profile = request.user.customer_profile
+    profile = get_object_or_404(
+        CustomerProfile.objects.select_related("user", "referrer__user"),
+        user=request.user,
+    )
+
+    balance = (
+        PointsTransaction.objects
+        .filter(customer=request.user)
+        .aggregate(total=Sum("points"))["total"]
+        or 0
+    )
+
+    purchases = Purchase.objects.filter(
+        customer=request.user
+    ).order_by("-purchased_at")
+
+    recent_purchases = purchases[:5]
+
+    purchase_count = purchases.count()
+    referral_count = profile.referrals.count()
+
+    eligible_rewards_count = Reward.objects.filter(
+        is_active=True,
+        points_required__lte=balance,
+    ).count()
+
+    recent_transactions = (
+        PointsTransaction.objects
+        .filter(customer=request.user)
+        .select_related("purchase")
+        .order_by("-created_at")[:5]
+    )
 
     return render(
         request,
         "accounts/profile.html",
-        {"profile": profile},
+        {
+            "profile": profile,
+            "balance": balance,
+            "recent_purchases": recent_purchases,
+            "recent_transactions": recent_transactions,
+            "purchase_count": purchase_count,
+            "referral_count": referral_count,
+            "eligible_rewards_count": eligible_rewards_count,
+        },
     )
 
 
