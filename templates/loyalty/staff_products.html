@@ -1,60 +1,150 @@
-
 {% extends "base.html" %}
-{% block title %}Manage Products | VSLink{% endblock %}
-{% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h2">Manage products</h1>
-    <a class="btn btn-primary" href="{% url 'loyalty:product_create' %}">
-        Add product
-    </a>
-</div>
 
-<div class="table-responsive">
-    <table class="table table-bordered table-hover align-middle bg-white">
-        <thead class="table-light">
-            <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Points</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for product in products %}
+{% block title %}Product Management | VSLink{% endblock %}
+
+{% block content %}
+<div class="staff-page">
+    <section class="staff-page-header">
+        <div>
+            <div class="section-kicker">STAFF WORKSPACE</div>
+            <h1>Product management</h1>
+            <p>Manage your catalogue, pricing, and loyalty points earned per purchase.</p>
+        </div>
+        <a href="{% url 'loyalty:product_create' %}" class="btn btn-primary px-4">
+            <i class="bi bi-plus-lg me-2"></i>Add product
+        </a>
+    </section>
+
+    <nav class="staff-tabs" aria-label="Staff navigation">
+        <a class="staff-tab staff-tab-active" href="{% url 'loyalty:staff_products' %}">
+            <i class="bi bi-box-seam me-2"></i>Products
+        </a>
+        <a class="staff-tab" href="{% url 'loyalty:staff_rewards' %}">
+            <i class="bi bi-gift me-2"></i>Rewards
+        </a>
+        <a class="staff-tab" href="{% url 'loyalty:referral_config' %}">
+            <i class="bi bi-diagram-3 me-2"></i>Referral settings
+        </a>
+    </nav>
+
+    <section class="staff-metrics">
+        <article class="staff-metric">
+            <span class="staff-metric-icon staff-metric-blue">
+                <i class="bi bi-box-seam"></i>
+            </span>
+            <div>
+                <span class="staff-metric-label">Total products</span>
+                <strong>{{ products|length }}</strong>
+            </div>
+        </article>
+        <article class="staff-metric">
+            <span class="staff-metric-icon staff-metric-green">
+                <i class="bi bi-shield-check"></i>
+            </span>
+            <div>
+                <span class="staff-metric-label">Catalogue management</span>
+                <strong>Enabled</strong>
+            </div>
+        </article>
+    </section>
+
+    <section class="staff-table-panel">
+        <div class="staff-table-heading">
+            <div>
+                <h2>All products</h2>
+                <p>Active products are visible to customers in the catalogue.</p>
+            </div>
+            <span class="staff-count-badge">{{ products|length }} items</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table staff-table align-middle mb-0">
+                <thead>
                 <tr>
-                    <td>{{ product.name }}</td>
-                    <td>₹{{ product.price }}</td>
-                    <td>{{ product.points }}</td>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Points earned</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        <div class="staff-record">
+                                <span class="staff-record-icon">
+                                    <i class="bi bi-box-seam"></i>
+                                </span>
+                            <div>
+                                <strong>{{ product.name }}</strong>
+                                <small>
+                                    {% if product.description %}
+                                    {{ product.description|truncatechars:70 }}
+                                    {% else %}
+                                    No description added
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="staff-price">₹{{ product.price|floatformat:2 }}</td>
+                    <td>
+                            <span class="staff-points-pill">
+                                <i class="bi bi-stars me-1"></i>{{ product.points }}
+                            </span>
+                    </td>
                     <td>
                         {% if product.is_active %}
-                            <span class="badge text-bg-success">Active</span>
+                        <span class="staff-status staff-status-active">
+                                    <span></span>Active
+                                </span>
                         {% else %}
-                            <span class="badge text-bg-secondary">Inactive</span>
+                        <span class="staff-status staff-status-inactive">
+                                    <span></span>Inactive
+                                </span>
                         {% endif %}
                     </td>
                     <td>
-                        <div class="d-flex gap-2">
+                        <div class="staff-actions justify-content-end">
                             <a class="btn btn-sm btn-outline-primary"
                                href="{% url 'loyalty:product_edit' product.pk %}">
-                                Edit
+                                <i class="bi bi-pencil me-1"></i>Edit
                             </a>
                             <form method="post"
                                   action="{% url 'loyalty:product_toggle' product.pk %}">
                                 {% csrf_token %}
-                                <button class="btn btn-sm btn-outline-secondary" type="submit">
+                                <button class="btn btn-sm btn-outline-secondary"
+                                        type="submit">
                                     {% if product.is_active %}Deactivate{% else %}Activate{% endif %}
                                 </button>
                             </form>
                         </div>
                     </td>
                 </tr>
-            {% empty %}
+                {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center py-4">No products created yet.</td>
+                    <td colspan="5">
+                        <div class="staff-empty-state">
+                            <span><i class="bi bi-box-seam"></i></span>
+                            <h3>No products yet</h3>
+                            <p>Create your first product to make it available in the catalogue.</p>
+                            <a href="{% url 'loyalty:product_create' %}"
+                               class="btn btn-primary">
+                                <i class="bi bi-plus-lg me-2"></i>Add first product
+                            </a>
+                        </div>
+                    </td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="staff-table-footer">
+            <i class="bi bi-info-circle me-2"></i>
+            Deactivating a product hides it from new customer purchases without deleting its record.
+        </div>
+    </section>
 </div>
 {% endblock %}
