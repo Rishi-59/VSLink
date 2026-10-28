@@ -1,26 +1,70 @@
 
 {% extends "base.html" %}
 
-{% block content %}
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2>Manage Rewards</h2>
-            <p class="text-muted mb-0">Create and manage customer redemption offers.</p>
-        </div>
-        <a href="{% url 'loyalty:reward_create' %}" class="btn btn-primary">
-            Add Reward
-        </a>
-    </div>
+{% block title %}Reward Management | VSLink{% endblock %}
 
-    {% if rewards %}
+{% block content %}
+<div class="staff-page">
+    <section class="staff-page-header">
+        <div>
+            <div class="section-kicker">STAFF WORKSPACE</div>
+            <h1>Reward management</h1>
+            <p>Create and maintain discount rewards customers can redeem using loyalty points.</p>
+        </div>
+        <a href="{% url 'loyalty:reward_create' %}" class="btn btn-primary px-4">
+            <i class="bi bi-plus-lg me-2"></i>Add reward
+        </a>
+    </section>
+
+    <nav class="staff-tabs" aria-label="Staff navigation">
+        <a class="staff-tab" href="{% url 'loyalty:staff_products' %}">
+            <i class="bi bi-box-seam me-2"></i>Products
+        </a>
+        <a class="staff-tab staff-tab-active" href="{% url 'loyalty:staff_rewards' %}">
+            <i class="bi bi-gift me-2"></i>Rewards
+        </a>
+        <a class="staff-tab" href="{% url 'loyalty:referral_config' %}">
+            <i class="bi bi-diagram-3 me-2"></i>Referral settings
+        </a>
+    </nav>
+
+    <section class="staff-metrics">
+        <article class="staff-metric">
+            <span class="staff-metric-icon staff-metric-purple">
+                <i class="bi bi-gift"></i>
+            </span>
+            <div>
+                <span class="staff-metric-label">Total rewards</span>
+                <strong>{{ rewards|length }}</strong>
+            </div>
+        </article>
+        <article class="staff-metric">
+            <span class="staff-metric-icon staff-metric-blue">
+                <i class="bi bi-sliders"></i>
+            </span>
+            <div>
+                <span class="staff-metric-label">Reward controls</span>
+                <strong>Available</strong>
+            </div>
+        </article>
+    </section>
+
+    <section class="staff-table-panel">
+        <div class="staff-table-heading">
+            <div>
+                <h2>All rewards</h2>
+                <p>Review point requirements, discount rules, and availability.</p>
+            </div>
+            <span class="staff-count-badge">{{ rewards|length }} items</span>
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle">
+            <table class="table staff-table align-middle mb-0">
                 <thead>
                     <tr>
                         <th>Reward</th>
-                        <th>Points Required</th>
-                        <th>Discount</th>
+                        <th>Points required</th>
+                        <th>Discount offer</th>
                         <th>Status</th>
                         <th class="text-end">Actions</th>
                     </tr>
@@ -29,51 +73,89 @@
                     {% for reward in rewards %}
                     <tr>
                         <td>
-                            <strong>{{ reward.name }}</strong>
-                            {% if reward.description %}
-                                <div class="small text-muted">{{ reward.description }}</div>
-                            {% endif %}
+                            <div class="staff-record">
+                                <span class="staff-record-icon staff-record-purple">
+                                    <i class="bi bi-gift"></i>
+                                </span>
+                                <div>
+                                    <strong>{{ reward.name }}</strong>
+                                    <small>
+                                        {% if reward.description %}
+                                            {{ reward.description|truncatechars:70 }}
+                                        {% else %}
+                                            No description added
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
                         </td>
-                        <td>{{ reward.points_required }}</td>
                         <td>
-                            {% if reward.discount_type == "FIXED" %}
-                                ₹{{ reward.discount_value|floatformat:2 }}
-                            {% else %}
-                                {{ reward.discount_value|floatformat:2 }}%
-                                (max ₹{{ reward.max_discount_amount|floatformat:2 }})
-                            {% endif %}
+                            <span class="staff-points-pill">
+                                <i class="bi bi-stars me-1"></i>
+                                {{ reward.points_required }} pts
+                            </span>
+                        </td>
+                        <td>
+                            <div class="staff-discount-value">
+                                {% if reward.discount_type == "FIXED" %}
+                                    ₹{{ reward.discount_value|floatformat:2 }} off
+                                {% else %}
+                                    {{ reward.discount_value|floatformat:2 }}% off
+                                    <small>Max ₹{{ reward.max_discount_amount|floatformat:2 }}</small>
+                                {% endif %}
+                            </div>
                         </td>
                         <td>
                             {% if reward.is_active %}
-                                <span class="badge bg-success">Active</span>
+                                <span class="staff-status staff-status-active">
+                                    <span></span>Active
+                                </span>
                             {% else %}
-                                <span class="badge bg-secondary">Inactive</span>
+                                <span class="staff-status staff-status-inactive">
+                                    <span></span>Inactive
+                                </span>
                             {% endif %}
                         </td>
-                        <td class="text-end">
-                            <a href="{% url 'loyalty:reward_edit' reward.pk %}"
-                               class="btn btn-sm btn-outline-primary">
-                                Edit
-                            </a>
-                            <form method="post"
-                                  action="{% url 'loyalty:reward_toggle' reward.pk %}"
-                                  class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit"
-                                        class="btn btn-sm btn-outline-secondary">
-                                    {% if reward.is_active %}Deactivate{% else %}Activate{% endif %}
-                                </button>
-                            </form>
+                        <td>
+                            <div class="staff-actions justify-content-end">
+                                <a href="{% url 'loyalty:reward_edit' reward.pk %}"
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil me-1"></i>Edit
+                                </a>
+                                <form method="post"
+                                      action="{% url 'loyalty:reward_toggle' reward.pk %}">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="btn btn-sm btn-outline-secondary">
+                                        {% if reward.is_active %}Deactivate{% else %}Activate{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="staff-empty-state">
+                                <span><i class="bi bi-gift"></i></span>
+                                <h3>No rewards created yet</h3>
+                                <p>Add a reward to give customers more ways to use their loyalty points.</p>
+                                <a href="{% url 'loyalty:reward_create' %}"
+                                   class="btn btn-primary">
+                                    <i class="bi bi-plus-lg me-2"></i>Create first reward
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    {% else %}
-        <div class="alert alert-info">
-            No rewards have been created yet. Add your first reward to get started.
+
+        <div class="staff-table-footer">
+            <i class="bi bi-info-circle me-2"></i>
+            Percentage discounts use the configured maximum discount cap.
         </div>
-    {% endif %}
+    </section>
 </div>
 {% endblock %}
