@@ -158,6 +158,7 @@ http://127.0.0.1:8000/
 | `/loyalty/staff/products/` | Staff product management |
 | `/loyalty/staff/rewards/` | Staff reward management |
 | `/loyalty/staff/referral-config/` | Referral bonus configuration |
+| `/loyalty/staff/customers/` | Staff customer reports |
 
 Some pages require an authenticated customer or a staff account.
 

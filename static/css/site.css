@@ -4849,3 +4849,85 @@ ul.referral-tree-children {
         font-size: 1rem;
     }
 }
+
+/* Staff customer reports */
+.staff-customer-filter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e8edf4;
+}
+
+.staff-customer-search {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex: 1;
+    max-width: 760px;
+}
+
+.staff-customer-search .form-control {
+    min-width: 180px;
+}
+
+.staff-customer-search-icon {
+    display: flex;
+    align-items: center;
+    color: #64748b;
+}
+
+.staff-customer-table {
+    min-width: 1200px;
+}
+
+.staff-customer-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 200px;
+}
+
+.staff-customer-contact strong {
+    font-weight: 700;
+}
+
+.staff-customer-contact small {
+    color: #64748b;
+    overflow-wrap: anywhere;
+}
+
+.staff-referral-code {
+    display: inline-block;
+    padding: 0.35rem 0.55rem;
+    border-radius: 0.5rem;
+    background: #f1f5f9;
+    color: #334155;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.staff-customer-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+    .staff-customer-filter {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .staff-customer-search {
+        max-width: none;
+    }
+
+    .staff-customer-search .form-control {
+        min-width: 0;
+    }
+}
