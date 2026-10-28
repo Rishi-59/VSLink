@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from django.db.models import Sum
 from django.http import Http404
 
@@ -23,6 +23,7 @@ from .models import (
 )
 
 from decimal import Decimal, ROUND_DOWN
+import uuid
 
 
 def staff_required(view_func):
@@ -153,6 +154,7 @@ def checkout_view(request, pk):
             "product": product,
             "balance": balance,
             "rewards": rewards,
+            "checkout_token": uuid.uuid4(),
         },
     )
 
@@ -161,7 +163,35 @@ def checkout_view(request, pk):
 @require_POST
 def complete_purchase(request, pk):
     try:
+        checkout_token = uuid.UUID(
+            request.POST.get("checkout_token", "")
+        )
+    except (ValueError, TypeError, AttributeError):
+        messages.error(
+            request,
+            "This checkout session is invalid. Please try again.",
+        )
+        return redirect("loyalty:checkout", pk=pk)
+    try:
         with transaction.atomic():
+            existing_purchase = Purchase.objects.filter(
+                checkout_token=checkout_token
+            ).first()
+
+            if existing_purchase:
+                if existing_purchase.customer_id == request.user.pk:
+                    messages.info(
+                        request,
+                        "This checkout was already completed.",
+                    )
+                    return redirect("loyalty:purchase_history")
+
+                messages.error(
+                    request,
+                    "This checkout token is invalid. Please try again.",
+                )
+                return redirect("loyalty:checkout", pk=pk)
+
             product = (
                 Product.objects
                 .select_for_update()
@@ -207,6 +237,7 @@ def complete_purchase(request, pk):
                 discount_amount=discount,
                 points_earned=product.points,
                 status=Purchase.Status.COMPLETED,
+                checkout_token=checkout_token,
             )
 
             PointsTransaction.objects.create(
@@ -293,6 +324,23 @@ def complete_purchase(request, pk):
             f"Purchase completed! You earned {product.points} points.",
         )
         return redirect("loyalty:purchase_history")
+
+    except IntegrityError:
+        existing_purchase = Purchase.objects.filter(
+            checkout_token=checkout_token
+        ).first()
+
+        if (
+                existing_purchase
+                and existing_purchase.customer_id == request.user.pk
+        ):
+            messages.info(
+                request,
+                "This checkout was already completed.",
+            )
+            return redirect("loyalty:purchase_history")
+
+        raise
 
     except Product.DoesNotExist:
         raise Http404("This product is unavailable.")

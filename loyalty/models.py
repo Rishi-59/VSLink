@@ -107,6 +107,12 @@ class Purchase(models.Model):
         default=Status.COMPLETED,
     )
     purchased_at = models.DateTimeField(auto_now_add=True)
+    checkout_token = models.UUIDField(
+        unique=True,
+        null=True,
+        blank=True,
+        editable=False,
+    )
 
     def __str__(self):
         return f"Purchase #{self.pk}"
