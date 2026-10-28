@@ -63,16 +63,16 @@ class Reward(models.Model):
                 "discount_value": "Percentage cannot exceed 100."
             })
 
-        if (
-            self.discount_type == self.DiscountType.PERCENTAGE
-            and self.max_discount_amount is None
-        ):
-            raise ValidationError({
-                "max_discount_amount": (
-                    "A maximum discount amount is required "
-                    "for percentage rewards."
-                )
-            })
+        # if (
+        #     self.discount_type == self.DiscountType.PERCENTAGE
+        #     and self.max_discount_amount is None
+        # ):
+        #     raise ValidationError({
+        #         "max_discount_amount": (
+        #             "A maximum discount amount is required "
+        #             "for percentage rewards."
+        #         )
+        #     })
 
     def __str__(self):
         return self.name

@@ -14,7 +14,7 @@ from loyalty.models import (
     ReferralConfig,
     Reward,
 )
-
+from loyalty.forms import RewardForm
 
 User = get_user_model()
 
@@ -329,4 +329,40 @@ class LoyaltyCheckoutRuleTests(TestCase):
         self.assertEqual(
             response.url,
             reverse("loyalty:catalogue"),
+        )
+
+    def test_percentage_reward_without_cap_is_allowed_and_applied(self):
+        self.add_points(100)
+
+        form = RewardForm(data={
+            "name": "Uncapped Percentage Reward",
+            "description": "",
+            "points_required": 40,
+            "discount_type": "PERCENTAGE",
+            "discount_value": "30.00",
+            "max_discount_amount": "",
+            "is_active": "on",
+        })
+
+        self.assertTrue(form.is_valid(), form.errors)
+        reward = form.save()
+
+        response = self.client.post(
+            self.checkout_url,
+            {
+                "checkout_token": self.checkout_token(),
+                "reward_id": str(reward.pk),
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        purchase = Purchase.objects.get(customer=self.user)
+        self.assertEqual(
+            purchase.discount_amount,
+            Decimal("150.00"),
+        )
+        self.assertEqual(
+            purchase.price_paid,
+            Decimal("350.00"),
         )
