@@ -49,4 +49,9 @@ urlpatterns = [
         views.staff_rewards_view,
         name="staff_rewards",
     ),
+    path(
+        "staff/referral-config/",
+        views.referral_config_view,
+        name="referral_config",
+    ),
 ]
