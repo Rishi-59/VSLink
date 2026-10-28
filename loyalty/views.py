@@ -10,7 +10,8 @@ from django.db import transaction
 from django.db.models import Sum
 from django.http import Http404
 
-from .forms import ProductForm
+from .forms import ProductForm, RewardForm
+
 from accounts.models import CustomerProfile
 from .models import (
     Product,
@@ -327,4 +328,73 @@ def purchase_history_view(request):
             "transactions": transactions,
             "balance": get_points_balance(request.user),
         },
+    )
+
+
+@login_required
+@staff_required
+def staff_rewards_view(request):
+    rewards = Reward.objects.all().order_by("-created_at")
+    return render(
+        request,
+        "loyalty/staff_rewards.html",
+        {"rewards": rewards},
+    )
+
+
+@login_required
+@staff_required
+def reward_create_view(request):
+    form = RewardForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Reward created successfully.")
+        return redirect("loyalty:staff_rewards")
+
+    return render(
+        request,
+        "loyalty/reward_form.html",
+        {"form": form, "page_title": "Add Reward"},
+    )
+
+
+@login_required
+@staff_required
+def reward_edit_view(request, pk):
+    reward = get_object_or_404(Reward, pk=pk)
+    form = RewardForm(request.POST or None, instance=reward)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Reward updated successfully.")
+        return redirect("loyalty:staff_rewards")
+
+    return render(
+        request,
+        "loyalty/reward_form.html",
+        {"form": form, "page_title": "Edit Reward"},
+    )
+
+
+@login_required
+@staff_required
+@require_POST
+def reward_toggle_view(request, pk):
+    reward = get_object_or_404(Reward, pk=pk)
+    reward.is_active = not reward.is_active
+    reward.save(update_fields=["is_active", "updated_at"])
+
+    status = "activated" if reward.is_active else "deactivated"
+    messages.success(request, f"Reward {status} successfully.")
+    return redirect("loyalty:staff_rewards")
+
+@login_required
+@staff_required
+def staff_rewards_view(request):
+    rewards = Reward.objects.all().order_by("-created_at")
+    return render(
+        request,
+        "loyalty/staff_rewards.html",
+        {"rewards": rewards},
     )
