@@ -1,4 +1,3 @@
-
 from django.urls import path
 
 from . import views
@@ -32,5 +31,22 @@ urlpatterns = [
         "purchases/",
         views.purchase_history_view,
         name="purchase_history",
+    ),
+    path("staff/rewards/", views.staff_rewards_view, name="staff_rewards"),
+    path("staff/rewards/add/", views.reward_create_view, name="reward_create"),
+    path(
+        "staff/rewards/<int:pk>/edit/",
+        views.reward_edit_view,
+        name="reward_edit",
+    ),
+    path(
+        "staff/rewards/<int:pk>/toggle/",
+        views.reward_toggle_view,
+        name="reward_toggle",
+    ),
+    path(
+        "staff/rewards/",
+        views.staff_rewards_view,
+        name="staff_rewards",
     ),
 ]
