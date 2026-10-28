@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Referral Tree | VSLink{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="h3">Referral Tree</h1>
+    <p class="text-muted mb-0">
+        Explore the referral relationships in your VSLink network.
+    </p>
+</div>
+
+{% if user.is_staff %}
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-8">
+                <label for="customer_id" class="form-label">
+                    View customer's referral tree
+                </label>
+                <select name="customer_id" id="customer_id"
+                        class="form-select">
+                    <option value="">My tree</option>
+                    {% for customer in customer_profiles %}
+                    <option value="{{ customer.pk }}">
+                        {% if customer.pk == selected_profile.pk %}
+                        selected
+                        {% endif %}>
+                        {{ customer.user.get_full_name|default:customer.user.username }}
+                        — {{ customer.referral_code }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-primary" type="submit">
+                    View Tree
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <h2 class="h5">Your referral chain</h2>
+
+        {% if ancestors %}
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            {% for ancestor in ancestors %}
+            <span class="badge text-bg-secondary p-2">
+                        {{ ancestor.user.get_full_name|default:ancestor.user.username }}
+                    </span>
+            <span class="text-muted">→</span>
+            {% endfor %}
+
+            <span class="badge text-bg-primary p-2">
+                    {{ selected_profile.user.get_full_name|default:selected_profile.user.username }}
+                    {% if selected_profile.pk == user.customer_profile.pk %}
+                        (You)
+                    {% endif %}
+                </span>
+        </div>
+        {% else %}
+        <p class="text-muted mb-0">
+            {% if selected_profile.pk == user.customer_profile.pk %}
+            You have no referrer above you.
+            {% else %}
+            This customer has no referrer above them.
+            {% endif %}
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h2 class="h5 mb-3">
+            Referral network starting from
+            {{ selected_profile.user.get_full_name|default:selected_profile.user.username }}
+        </h2>
+
+        <p class="text-muted small">
+            Each nested level represents customers referred by the level above.
+        </p>
+
+        <ul class="referral-tree">
+            {% include "accounts/_referral_node.html" with node=tree root_profile=selected_profile %}
+        </ul>
+    </div>
+</div>
+
+<style>
+    .referral-tree,
+    .referral-tree ul {
+        list-style: none;
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+
+    .referral-tree {
+        padding-left: 0;
+    }
+
+    .referral-tree ul {
+        border-left: 2px solid #dee2e6;
+        margin-left: 0.75rem;
+    }
+
+    .referral-tree li {
+        position: relative;
+        padding: 0.45rem 0;
+    }
+
+    .referral-node {
+        display: inline-block;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 0.65rem 0.85rem;
+        background: #fff;
+    }
+
+    .referral-node-you {
+        border-color: #0d6efd;
+        background: #eaf2ff;
+    }
+
+    /* Force referral tree into a vertical hierarchy */
+    .referral-tree,
+    .referral-tree ul {
+        display: block !important;
+        list-style: none;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding-left: 28px;
+    }
+
+    .referral-tree {
+        padding-left: 0;
+    }
+
+    .referral-tree li {
+        display: block !important;
+        width: 100%;
+        margin: 12px 0;
+        padding: 0;
+    }
+
+    .referral-tree ul {
+        display: block !important;
+        border-left: 2px solid #dee2e6;
+        margin-left: 12px;
+        padding-left: 24px;
+    }
+
+    .referral-tree li > div,
+    .referral-tree li > .referral-node {
+        display: block;
+        width: fit-content;
+        max-width: 100%;
+    }
+</style>
+{% endblock %}
