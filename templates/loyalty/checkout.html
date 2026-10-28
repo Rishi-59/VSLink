@@ -109,7 +109,11 @@
 
                 <form method="post" class="checkout-form">
                     {% csrf_token %}
-
+                    <input
+                        type="hidden"
+                        name="checkout_token"
+                        value="{{ checkout_token }}"
+                    >
                     <div class="checkout-order-product">
                         <span class="checkout-order-icon">
                             <i class="bi bi-box-seam"></i>
