@@ -9,23 +9,47 @@ https://docs.djangoproject.com/en/6.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
-
+import os
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g2wfkvuy%s=81m$qdox94wnmkz!w@&$t1qck878-v)ke#88kc#'
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get(
+    "DJANGO_DEBUG",
+    "true",
+).lower() in {"1", "true", "yes"}
 
-ALLOWED_HOSTS = []
+if not SECRET_KEY:
+    if DEBUG:
+        # Local development only. Never use this key in production.
+        SECRET_KEY = "local-development-only-not-for-production"
+    else:
+        raise ImproperlyConfigured(
+            "Set DJANGO_SECRET_KEY when DEBUG is disabled."
+        )
+
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "DJANGO_ALLOWED_HOSTS",
+        "localhost,127.0.0.1",
+    ).split(",")
+    if host.strip()
+]
 
 
 # Application definition

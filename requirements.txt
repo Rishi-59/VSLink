@@ -4,6 +4,8 @@ asgiref==3.13.0
     # via django
 django==6.1.2
     # via vslink
+python-dotenv==1.2.4
+    # via vslink
 sqlparse==0.6.0
     # via django
 tzdata==2026.5 ; sys_platform == 'win32'

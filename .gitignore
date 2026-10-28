@@ -12,6 +12,7 @@ env/
 # Environment variables and secrets
 .env
 .env.*
+!.env.example
 
 # Local database
 db.sqlite3
