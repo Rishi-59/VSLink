@@ -1,0 +1,25 @@
+<li>
+    <div class="referral-node {% if node.profile.pk == root_profile.pk %}referral-node-you{% endif %}">
+        <strong>
+            {{ node.profile.user.get_full_name|default:node.profile.user.username }}
+        </strong>
+
+        {% if node.profile.pk == root_profile.pk %}
+        <span class="badge text-bg-primary ms-1">Selected customer</span>
+        {% endif %}
+
+        <div class="small text-muted">
+            Referral code: {{ node.profile.referral_code }}
+        </div>
+    </div>
+
+    {% if node.children %}
+    <ul>
+        {% for child in node.children %}
+        {% include "accounts/_referral_node.html" with node=child %}
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-muted ms-3">No direct referrals</p>
+    {% endif %}
+</li>
