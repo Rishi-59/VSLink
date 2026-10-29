@@ -4,7 +4,12 @@ import string
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.core.validators import RegexValidator
 
+PHONE_VALIDATOR = RegexValidator(
+    regex=r"\A[0-9]{10}\Z",
+    message="Enter a valid 10-digit phone number.",
+)
 
 def generate_referral_code():
     alphabet = string.ascii_uppercase + string.digits
@@ -17,7 +22,11 @@ class CustomerProfile(models.Model):
         on_delete=models.PROTECT,
         related_name="customer_profile",
     )
-    phone = models.CharField(max_length=15, blank=True)
+    phone = models.CharField(
+        max_length=10,
+        blank=True,
+        validators=[PHONE_VALIDATOR],
+    )
     referral_code = models.CharField(
         max_length=8,
         unique=True,

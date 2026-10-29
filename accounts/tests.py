@@ -94,6 +94,39 @@ class RegistrationFormTests(TestCase):
             self.referrer_profile.referral_code,
         )
 
+    def test_phone_accepts_exactly_ten_digits(self):
+        form = RegistrationForm(
+            data=self.registration_data(phone="9876543210")
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_phone_can_be_blank(self):
+        form = RegistrationForm(
+            data=self.registration_data(phone="")
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+
+    def test_invalid_phone_numbers_are_rejected(self):
+        invalid_numbers = [
+            "123456789",  # 9 digits
+            "12345678901",  # 11 digits
+            "abcdefghij",  # letters
+            "12345abcde",  # letters and digits
+            "123-456789",  # punctuation
+            "123 456 789",  # spaces
+        ]
+
+        for phone in invalid_numbers:
+            with self.subTest(phone=phone):
+                form = RegistrationForm(
+                    data=self.registration_data(phone=phone)
+                )
+
+                self.assertFalse(form.is_valid())
+                self.assertIn("phone", form.errors)
+
 
 class CustomerProfileReferralIntegrityTests(TestCase):
     def setUp(self):
@@ -139,3 +172,9 @@ class CustomerProfileReferralIntegrityTests(TestCase):
             self.second_profile.referrer,
             self.first_profile,
         )
+
+    def test_profile_rejects_phone_with_non_digits(self):
+        self.second_profile.phone = "12345abcde"
+
+        with self.assertRaises(ValidationError):
+            self.second_profile.save()

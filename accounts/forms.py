@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
 
-from .models import CustomerProfile
+from .models import CustomerProfile, PHONE_VALIDATOR
 
 User = get_user_model()
 
@@ -13,7 +13,7 @@ class RegistrationForm(UserCreationForm):
     first_name = forms.CharField(max_length=150)
     last_name = forms.CharField(max_length=150)
     email = forms.EmailField()
-    phone = forms.CharField(max_length=15, required=False)
+    phone = forms.CharField(max_length=15, required=False, validators=[PHONE_VALIDATOR])
     referral_code = forms.CharField(
         max_length=8,
         required=False,
