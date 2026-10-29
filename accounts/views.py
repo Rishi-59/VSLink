@@ -53,10 +53,14 @@ def login_view(request):
 
 @login_required
 def profile_view(request):
-    profile = get_object_or_404(
-        CustomerProfile.objects.select_related("user", "referrer__user"),
-        user=request.user,
+    profile, _ = CustomerProfile.objects.get_or_create(
+        user=request.user
     )
+
+    profile = CustomerProfile.objects.select_related(
+        "user",
+        "referrer__user",
+    ).get(pk=profile.pk)
 
     balance = (
         PointsTransaction.objects
@@ -128,10 +132,14 @@ def build_referral_branch(profile):
 
 @login_required
 def referral_tree_view(request):
-    current_profile = get_object_or_404(
-        CustomerProfile.objects.select_related("user", "referrer__user"),
-        user=request.user,
+    current_profile, _ = CustomerProfile.objects.get_or_create(
+        user=request.user
     )
+
+    current_profile = CustomerProfile.objects.select_related(
+        "user",
+        "referrer__user",
+    ).get(pk=current_profile.pk)
 
     selected_profile = current_profile
 
