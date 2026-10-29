@@ -12,6 +12,7 @@ The application is built with Django and uses SQLite for local development. Staf
 - Optional referral codes during registration, with server-side validation.
 - Referral relationships that cannot be changed after registration.
 - Customer dashboard with points balance, purchase activity, and recent transactions.
+- Phone numbers are optional, but supplied numbers must contain exactly 10 digits.
 
 ### Products and purchases
 - Product catalogue containing active products and their prices.
